@@ -1,0 +1,339 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}Member List - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --gray-dark: #0f1531;
+        --blue: #5e50f9;
+        --indigo: #6610f2;
+        --purple: #6a008a;
+        --pink: #e91e63;
+        --red: #f96868;
+        --orange: #f2a654;
+        --yellow: #f6e84e;
+        --green: #46c35f;
+        --teal: #58d8a3;
+        --cyan: #57c7d4;
+        --white: #ffffff;
+        --gray: #434a54;
+        --gray-light: #aab2bd;
+        --gray-lighter: #e8eff4;
+        --gray-lightest: #e6e9ed;
+    }
+    
+    .search-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .member-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+        border-left: 4px solid var(--blue);
+    }
+    
+    .member-card.inactive {
+        border-left-color: var(--red);
+        opacity: 0.8;
+    }
+    
+    .member-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .member-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--blue);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .member-info {
+        flex: 1;
+    }
+    
+    .member-name {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--gray-dark);
+        margin: 0;
+    }
+    
+    .member-details {
+        color: var(--gray);
+        font-size: 0.9rem;
+        margin: 5px 0;
+    }
+    
+    .activity-stats {
+        display: flex;
+        gap: 20px;
+        margin-top: 10px;
+    }
+    
+    .stat-badge {
+        background: var(--gray-lightest);
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        color: var(--gray);
+    }
+    
+    .stat-badge.good {
+        background: var(--green);
+        color: var(--white);
+    }
+    
+    .stat-badge.warning {
+        background: var(--orange);
+        color: var(--white);
+    }
+    
+    .stat-badge.danger {
+        background: var(--red);
+        color: var(--white);
+    }
+    
+    .member-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .btn-custom {
+        background: var(--blue);
+        color: var(--white);
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .btn-custom:hover {
+        background: var(--indigo);
+        color: var(--white);
+        text-decoration: none;
+    }
+    
+    .btn-outline {
+        background: transparent;
+        color: var(--blue);
+        border: 2px solid var(--blue);
+        padding: 6px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .btn-outline:hover {
+        background: var(--blue);
+        color: var(--white);
+        text-decoration: none;
+    }
+    
+    .form-control {
+        border: 2px solid var(--gray-lighter);
+        border-radius: 5px;
+        padding: 10px;
+    }
+    
+    .form-control:focus {
+        border-color: var(--blue);
+        outline: none;
+        box-shadow: 0 0 5px rgba(94, 80, 249, 0.3);
+    }
+    
+    .status-tabs {
+        display: flex;
+        margin-bottom: 20px;
+        background: var(--gray-lightest);
+        border-radius: 10px;
+        padding: 5px;
+    }
+    
+    .status-tab {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: var(--gray);
+        font-weight: bold;
+    }
+    
+    .status-tab.active {
+        background: var(--blue);
+        color: var(--white);
+    }
+    
+    .status-tab:hover {
+        text-decoration: none;
+        color: var(--blue);
+    }
+    
+    .status-tab.active:hover {
+        color: var(--white);
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .page-link {
+        background: var(--white);
+        color: var(--blue);
+        padding: 8px 15px;
+        margin: 0 3px;
+        border: 1px solid var(--gray-lighter);
+        border-radius: 5px;
+        text-decoration: none;
+    }
+    
+    .page-link:hover, .page-link.active {
+        background: var(--blue);
+        color: var(--white);
+        text-decoration: none;
+    }
+    
+    .page-header {
+        background: var(--white);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="main-panel">
+    <div class="content-wrapper pb-0">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 style="color: var(--gray-dark); margin: 0;">Member Management</h2>
+                    <p style="color: var(--gray); margin: 5px 0 0 0;">View and manage all gym members</p>
+                </div>
+                <a href="{% url 'admin_monitoring_dashboard' %}" class="btn-custom">← Back to Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Search and Status Filters -->
+        <div class="search-card">
+            <form method="GET" class="row align-items-end">
+                <div class="col-md-8">
+                    <label style="color: var(--gray); font-weight: bold;">Search Members:</label>
+                    <input type="text" name="search" value="{{ search }}" 
+                           placeholder="Search by name, mobile, or email..." class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn-custom form-control">Search</button>
+                </div>
+            </form>
+            
+            <div class="status-tabs">
+                <a href="?search={{ search }}&status=active" 
+                   class="status-tab {% if status_filter == 'active' %}active{% endif %}">
+                    Active Members
+                </a>
+                <a href="?search={{ search }}&status=inactive" 
+                   class="status-tab {% if status_filter == 'inactive' %}active{% endif %}">
+                    Inactive Members
+                </a>
+                <a href="?search={{ search }}&status=" 
+                   class="status-tab {% if status_filter == '' %}active{% endif %}">
+                    All Members
+                </a>
+            </div>
+        </div>
+
+        <!-- Members List -->
+        <div class="row">
+            <div class="col-md-12">
+                {% if members %}
+                    {% for member in members %}
+                    <div class="member-card {% if not member.Active_status %}inactive{% endif %}">
+                        <div class="member-header">
+                            <div style="display: flex; align-items: center; flex: 1;">
+                                <div class="member-avatar">
+                                    {{ member.First_Name|first }}
+                                </div>
+                                <div class="member-info">
+                                    <h5 class="member-name">
+                                        {{ member.First_Name }} {{ member.Last_Name|default:"" }}
+                                        {% if not member.Active_status %}
+                                            <span style="color: var(--red); font-size: 0.8rem;">(Inactive)</span>
+                                        {% endif %}
+                                    </h5>
+                                    <div class="member-details">
+                                        <strong>Mobile:</strong> {{ member.Mobile_Number }} | 
+                                        <strong>Email:</strong> {{ member.Email|default:"Not provided" }} |
+                                        <strong>Joined:</strong> {{ member.Registration_Date|date:"M d, Y" }}
+                                    </div>
+                                    <div class="activity-stats">
+                                        <span class="stat-badge {% if member.total_logs > 10 %}good{% elif member.total_logs > 5 %}warning{% else %}danger{% endif %}">
+                                            Total Logs: {{ member.total_logs }}
+                                        </span>
+                                        <span class="stat-badge {% if member.recent_logs > 3 %}good{% elif member.recent_logs > 0 %}warning{% else %}danger{% endif %}">
+                                            Last 7 Days: {{ member.recent_logs }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <a href="{% url 'member_detail_logs' member.id %}" class="btn-custom">View Logs</a>
+                                <a href="{% url 'admin_daily_logs_review' %}?member={{ member.id }}" class="btn-outline">Recent Activity</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- Pagination -->
+                    {% if members.has_other_pages %}
+                    <div class="pagination">
+                        {% if members.has_previous %}
+                            <a href="?page=1&search={{ search }}&status={{ status_filter }}" class="page-link">First</a>
+                            <a href="?page={{ members.previous_page_number }}&search={{ search }}&status={{ status_filter }}" class="page-link">Previous</a>
+                        {% endif %}
+                        
+                        <span class="page-link active">{{ members.number }} of {{ members.paginator.num_pages }}</span>
+                        
+                        {% if members.has_next %}
+                            <a href="?page={{ members.next_page_number }}&search={{ search }}&status={{ status_filter }}" class="page-link">Next</a>
+                            <a href="?page={{ members.paginator.num_pages }}&search={{ search }}&status={{ status_filter }}" class="page-link">Last</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="member-card">
+                        <div class="alert-info">
+                            No members found matching your search criteria.
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

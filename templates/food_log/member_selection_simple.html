@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Member - Daily Logging</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+        }
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.9);
+        }
+        .member-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            background: white;
+            margin-bottom: 15px;
+        }
+        .member-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.15);
+        }
+        .member-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #f8f9fa;
+        }
+        .btn-select {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 8px 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .search-box {
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            padding: 12px 20px;
+            font-size: 16px;
+        }
+        .search-box:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102,126,234,0.25);
+        }
+        .title {
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+        .no-members {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <h1 class="title">
+                    <i class="fas fa-dumbbell"></i>
+                    Daily Fitness Logging
+                </h1>
+                <p class="text-center text-white mb-4">Select your profile to log today's progress</p>
+                
+                <div class="card">
+                    <div class="card-body p-4">
+                        <!-- Search Form -->
+                        <form method="GET" class="mb-4">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control search-box" name="search" 
+                                               placeholder="Search by name or mobile number..." 
+                                               value="{{ search_query }}">
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Members List -->
+                        {% if members %}
+                            <div class="row">
+                                {% for member in members %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="member-card p-3">
+                                        <div class="d-flex align-items-center mb-3">
+                                            {% if member.Photo %}
+                                                <img src="{{ member.Photo.url }}" alt="Photo" class="member-photo me-3">
+                                            {% else %}
+                                                <div class="member-photo me-3 d-flex align-items-center justify-content-center bg-secondary">
+                                                    <i class="fas fa-user text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">{{ member.First_Name }} {{ member.Last_Name|default:"" }}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-phone"></i> {{ member.Mobile_Number }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="text-center">
+                                            <a href="{% url 'daily_log_entry' member.id %}" 
+                                               class="btn btn-primary btn-select w-100">
+                                                <i class="fas fa-arrow-right"></i> Select & Log
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="no-members py-5">
+                                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                                <h5>No members found</h5>
+                                <p>Try searching with a different name or mobile number</p>
+                                <a href="{% url 'member_selection_for_logging' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-refresh"></i> View All Members
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

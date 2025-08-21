@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strength Base - PROFIT - Member Logon</title>
+    <link rel="stylesheet" href="{%static 'assets/vendors/mdi/css/materialdesignicons.min.css' %}" />
+    <link rel="stylesheet" href="{%static 'assets/vendors/flag-icon-css/css/flag-icon.min.css' %}" />
+    <link rel="stylesheet" href="{%static 'assets/vendors/css/vendor.bundle.base.css' %}" />
+    <link rel="stylesheet" href="{%static 'assets/vendors/font-awesome/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{%static 'assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css' %}" />
+    <link rel="stylesheet" href="{%static 'assets/css/style.css' %}" />
+    <link rel="shortcut icon" href="{%static 'assets/images/Logo_Reveal_Slides.png' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+        <style>
+            
+
+    body {
+      background: -webkit-gradient(linear, left top, left bottom, from(#e6e5f2), to(#4599cd)) !important;
+      background: linear-gradient(to right, #e6e5f2, #4599cd) !important;
+      font-family: "Rubik", sans-serif;
+    }
+    .login-card{
+      margin: auto;
+      margin-top: 0%;
+    }
+  </style>
+       
+</head>
+
+<body>
+
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 grid-margin stretch-card login-card">
+                <div class="card " style="box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;">
+                    <div class="card-body ">
+                        <div class="container mt-4">
+                            <div
+                                class="text-center sidebar-brand-wrapper d-flex align-items-center justify-content-center">
+                                <a class="sidebar-brand brand-logo" href="">
+                                    <img src="{% static 'assets/images/Logo_Reveal_Slides.png' %}"
+                                        style="height: 150px; object-fit: contain;" alt="logo" />
+                                </a>
+                            </div>
+                        </div>
+
+                      
+                        <h2 class="mt-2">Member Logon</h2>
+                    
+                    <form method="post" action="{% url 'member_food_dashboard_log' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="memberId" class="form-label">Member ID</label>
+                            <input type="number" class="form-control" id="memberId" name="mid" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="accessPin" class="form-label">Access PIN</label>
+                            <input type="number" class="form-control" id="accessPin" name="accessid" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Log In</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+</body>
+
+</html>

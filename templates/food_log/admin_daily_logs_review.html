@@ -1,0 +1,327 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}Daily Logs Review - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --gray-dark: #0f1531;
+        --blue: #5e50f9;
+        --indigo: #6610f2;
+        --purple: #6a008a;
+        --pink: #e91e63;
+        --red: #f96868;
+        --orange: #f2a654;
+        --yellow: #f6e84e;
+        --green: #46c35f;
+        --teal: #58d8a3;
+        --cyan: #57c7d4;
+        --white: #ffffff;
+        --gray: #434a54;
+        --gray-light: #aab2bd;
+        --gray-lighter: #e8eff4;
+        --gray-lightest: #e6e9ed;
+    }
+    
+    .filter-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .log-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border-left: 4px solid var(--green);
+    }
+    
+    .meal-item {
+        background: var(--gray-lightest);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 3px solid var(--orange);
+    }
+    
+    .meal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .meal-type {
+        background: var(--orange);
+        color: var(--white);
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    
+    .comment-section {
+        background: var(--white);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+        border: 1px solid var(--gray-lighter);
+    }
+    
+    .existing-comment {
+        background: var(--cyan);
+        color: var(--white);
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    
+    .form-control {
+        border: 2px solid var(--gray-lighter);
+        border-radius: 5px;
+        padding: 10px;
+    }
+    
+    .form-control:focus {
+        border-color: var(--blue);
+        outline: none;
+        box-shadow: 0 0 5px rgba(94, 80, 249, 0.3);
+    }
+    
+    .btn-custom {
+        background: var(--blue);
+        color: var(--white);
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .btn-custom:hover {
+        background: var(--indigo);
+    }
+    
+    .btn-comment {
+        background: var(--teal);
+        color: var(--white);
+        border: none;
+        padding: 5px 15px;
+        border-radius: 3px;
+        font-size: 0.8rem;
+    }
+    
+    .btn-comment:hover {
+        background: var(--cyan);
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .page-link {
+        background: var(--white);
+        color: var(--blue);
+        padding: 8px 15px;
+        margin: 0 3px;
+        border: 1px solid var(--gray-lighter);
+        border-radius: 5px;
+        text-decoration: none;
+    }
+    
+    .page-link:hover, .page-link.active {
+        background: var(--blue);
+        color: var(--white);
+        text-decoration: none;
+    }
+    
+    .page-header {
+        background: var(--white);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="main-panel">
+    <div class="content-wrapper pb-0">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 style="color: var(--gray-dark); margin: 0;">Daily Logs Review</h2>
+                    <p style="color: var(--gray); margin: 5px 0 0 0;">Review and comment on member food logs</p>
+                </div>
+                <a href="{% url 'admin_monitoring_dashboard' %}" class="btn-custom">← Back to Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-card">
+            <h4 style="color: var(--gray-dark); margin-bottom: 20px;">Filters</h4>
+            <form method="GET" class="row">
+                <div class="col-md-3">
+                    <label style="color: var(--gray); font-weight: bold;">Date:</label>
+                    <input type="date" name="date" value="{{ date_filter }}" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label style="color: var(--gray); font-weight: bold;">Member:</label>
+                    <select name="member" class="form-control">
+                        <option value="">All Members</option>
+                        {% for member in members %}
+                        <option value="{{ member.id }}" {% if member.id|stringformat:"s" == member_filter %}selected{% endif %}>
+                            {{ member.First_Name }} {{ member.Last_Name|default:"" }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label style="color: var(--gray); font-weight: bold;">Meal Type:</label>
+                    <select name="meal_type" class="form-control">
+                        <option value="">All Meal Types</option>
+                        {% for choice in meal_choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == meal_type_filter %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label style="visibility: hidden;">Action:</label>
+                    <button type="submit" class="btn-custom form-control">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Meal Entries -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="activity-card">
+                    <h4 class="section-title">Meal Entries</h4>
+                    {% if meals %}
+                        {% for meal in meals %}
+                        <div class="meal-item">
+                            <div class="meal-header">
+                                <div>
+                                    <strong style="color: var(--gray-dark);">
+                                        {{ meal.daily_log.member.First_Name }} {{ meal.daily_log.member.Last_Name|default:"" }}
+                                    </strong>
+                                    <span class="meal-type">{{ meal.get_meal_display_name }}</span>
+                                </div>
+                                <div style="color: var(--gray); font-size: 0.9rem;">
+                                    {{ meal.daily_log.date|date:"M d, Y" }}
+                                    {% if meal.time_consumed %} at {{ meal.time_consumed|time:"H:i" }}{% endif %}
+                                </div>
+                            </div>
+                            
+                            <div style="color: var(--gray-dark); margin-bottom: 10px;">
+                                {{ meal.meal_description|truncatewords:20 }}
+                            </div>
+                            
+                            {% if meal.calories_estimate %}
+                            <div style="color: var(--gray); font-size: 0.9rem; margin-bottom: 10px;">
+                                Estimated Calories: {{ meal.calories_estimate }}
+                            </div>
+                            {% endif %}
+                            
+                            {% if meal.food_image %}
+                            <div style="margin-bottom: 10px;">
+                                <img src="{{ meal.food_image.url }}" alt="Food Image" style="max-width: 200px; border-radius: 5px;">
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Comments Section -->
+                            {% if meal.admin_comment %}
+                            <div class="existing-comment">
+                                <strong>Admin Comment:</strong> {{ meal.admin_comment }}
+                                <br>
+                                <small>By {{ meal.commented_by.username }} on {{ meal.comment_date|date:"M d, Y H:i" }}</small>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="comment-section">
+                                <form class="comment-form" data-meal-id="{{ meal.id }}">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <textarea name="comment" placeholder="Add your comment for this meal..." 
+                                                    class="form-control" rows="2" required></textarea>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button type="submit" class="btn-comment form-control">Add Comment</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- Pagination for Meals -->
+                        {% if meals.has_other_pages %}
+                        <div class="pagination">
+                            {% if meals.has_previous %}
+                                <a href="?meals_page=1{% if date_filter %}&date={{ date_filter }}{% endif %}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if meal_type_filter %}&meal_type={{ meal_type_filter }}{% endif %}" class="page-link">First</a>
+                                <a href="?meals_page={{ meals.previous_page_number }}{% if date_filter %}&date={{ date_filter }}{% endif %}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if meal_type_filter %}&meal_type={{ meal_type_filter }}{% endif %}" class="page-link">Previous</a>
+                            {% endif %}
+                            
+                            <span class="page-link active">{{ meals.number }} of {{ meals.paginator.num_pages }}</span>
+                            
+                            {% if meals.has_next %}
+                                <a href="?meals_page={{ meals.next_page_number }}{% if date_filter %}&date={{ date_filter }}{% endif %}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if meal_type_filter %}&meal_type={{ meal_type_filter }}{% endif %}" class="page-link">Next</a>
+                                <a href="?meals_page={{ meals.paginator.num_pages }}{% if date_filter %}&date={{ date_filter }}{% endif %}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if meal_type_filter %}&meal_type={{ meal_type_filter }}{% endif %}" class="page-link">Last</a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert-info">
+                            No meal entries found for the selected filters.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle comment form submission
+    document.querySelectorAll('.comment-form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const mealId = this.dataset.mealId;
+            const formData = new FormData(this);
+            formData.append('meal_id', mealId);
+            
+            fetch('{% url "add_meal_comment" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload(); // Reload to show the new comment
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while adding the comment.');
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

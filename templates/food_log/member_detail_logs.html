@@ -1,0 +1,320 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}{{ member.First_Name }} - Detailed Logs{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --gray-dark: #0f1531;
+        --blue: #5e50f9;
+        --indigo: #6610f2;
+        --purple: #6a008a;
+        --pink: #e91e63;
+        --red: #f96868;
+        --orange: #f2a654;
+        --yellow: #f6e84e;
+        --green: #46c35f;
+        --teal: #58d8a3;
+        --cyan: #57c7d4;
+        --white: #ffffff;
+        --gray: #434a54;
+        --gray-light: #aab2bd;
+        --gray-lighter: #e8eff4;
+        --gray-lightest: #e6e9ed;
+    }
+    
+    .member-profile {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        border-left: 4px solid var(--blue);
+    }
+    
+    .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--blue);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 25px;
+        font-weight: bold;
+        font-size: 2rem;
+    }
+    
+    .profile-info h3 {
+        color: var(--gray-dark);
+        margin: 0 0 5px 0;
+    }
+    
+    .profile-details {
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+    
+    .log-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border-left: 4px solid var(--green);
+    }
+    
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--gray-lighter);
+    }
+    
+    .meal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .meal-item {
+        background: var(--gray-lightest);
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 3px solid var(--orange);
+    }
+    
+    .meal-type {
+        background: var(--orange);
+        color: var(--white);
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+    
+    .weight-info {
+        background: var(--teal);
+        color: var(--white);
+        padding: 10px 15px;
+        border-radius: 8px;
+        display: inline-block;
+        font-weight: bold;
+    }
+    
+    .goal-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border-left: 4px solid var(--purple);
+    }
+    
+    .filter-bar {
+        background: var(--white);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .btn-custom {
+        background: var(--blue);
+        color: var(--white);
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-custom:hover {
+        background: var(--indigo);
+        color: var(--white);
+        text-decoration: none;
+    }
+    
+    .page-header {
+        background: var(--white);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .no-data {
+        background: var(--gray-lightest);
+        padding: 40px;
+        text-align: center;
+        border-radius: 10px;
+        color: var(--gray);
+    }
+</style>
+
+<div class="main-panel">
+    <div class="content-wrapper pb-0">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 style="color: var(--gray-dark); margin: 0;">Member Detail Logs</h2>
+                    <p style="color: var(--gray); margin: 5px 0 0 0;">Detailed food and weight tracking for {{ member.First_Name }}</p>
+                </div>
+                <a href="{% url 'admin_member_list' %}" class="btn-custom">← Back to Members</a>
+            </div>
+        </div>
+
+        <!-- Member Profile -->
+        <div class="member-profile">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    {{ member.First_Name|first }}
+                </div>
+                <div class="profile-info">
+                    <h3>{{ member.First_Name }} {{ member.Last_Name|default:"" }}</h3>
+                    <div class="profile-details">
+                        <strong>Mobile:</strong> {{ member.Mobile_Number }} | 
+                        <strong>Email:</strong> {{ member.Email|default:"Not provided" }} | 
+                        <strong>Gender:</strong> {{ member.Gender }} |
+                        <strong>Status:</strong> 
+                        <span style="color: {% if member.Active_status %}var(--green){% else %}var(--red){% endif %};">
+                            {% if member.Active_status %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                    {% if member.Medical_History %}
+                    <div class="profile-details" style="margin-top: 10px;">
+                        <strong>Medical History:</strong> {{ member.Medical_History|truncatewords:15 }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <form method="GET" class="row align-items-end">
+                <div class="col-md-6">
+                    <label style="color: var(--gray); font-weight: bold;">Time Period:</label>
+                    <select name="days" class="form-control">
+                        <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 Days</option>
+                        <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 Days</option>
+                        <option value="90" {% if days == 90 %}selected{% endif %}>Last 3 Months</option>
+                        <option value="365" {% if days == 365 %}selected{% endif %}>Last Year</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <button type="submit" class="btn-custom form-control">Apply Filter</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Weight Goals -->
+        {% if weight_goals %}
+        <div class="goal-card">
+            <h4 style="color: var(--purple); margin-bottom: 15px;">Active Weight Goals</h4>
+            {% for goal in weight_goals %}
+            <div style="margin-bottom: 10px; padding: 10px; background: var(--gray-lightest); border-radius: 5px;">
+                <strong>Target Weight:</strong> {{ goal.target_weight }}kg | 
+                <strong>Target Date:</strong> {{ goal.target_date|date:"M d, Y" }} | 
+                <strong>Set On:</strong> {{ goal.created_date|date:"M d, Y" }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Daily Logs -->
+        <div class="row">
+            <div class="col-md-12">
+                {% if logs %}
+                    {% for log in logs %}
+                    <div class="log-card">
+                        <div class="log-header">
+                            <div>
+                                <h5 style="color: var(--gray-dark); margin: 0;">{{ log.date|date:"l, F d, Y" }}</h5>
+                                {% if log.weight %}
+                                <div class="weight-info">Weight: {{ log.weight }}kg</div>
+                                {% endif %}
+                            </div>
+                            <div style="color: var(--gray); font-size: 0.9rem;">
+                                {{ log.meals.count }} meal(s) logged
+                            </div>
+                        </div>
+                        
+                        {% if log.notes %}
+                        <div style="background: var(--gray-lightest); padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                            <strong style="color: var(--gray);">Notes:</strong> {{ log.notes }}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Meals for this day -->
+                        {% if log.meals.all %}
+                        <div class="meal-grid">
+                            {% for meal in log.meals.all %}
+                            <div class="meal-item">
+                                <div style="margin-bottom: 10px;">
+                                    <span class="meal-type">{{ meal.get_meal_display_name }}</span>
+                                    {% if meal.time_consumed %}
+                                    <span style="color: var(--gray); font-size: 0.8rem; margin-left: 10px;">
+                                        {{ meal.time_consumed|time:"H:i" }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div style="color: var(--gray-dark); margin-bottom: 8px;">
+                                    {{ meal.meal_description|truncatewords:15 }}
+                                </div>
+                                
+                                {% if meal.calories_estimate %}
+                                <div style="color: var(--gray); font-size: 0.8rem; margin-bottom: 8px;">
+                                    Calories: {{ meal.calories_estimate }}
+                                </div>
+                                {% endif %}
+                                
+                                {% if meal.food_image %}
+                                <div style="margin-bottom: 10px;">
+                                    <img src="{{ meal.food_image.url }}" alt="Food" 
+                                         style="max-width: 100%; height: 120px; object-fit: cover; border-radius: 5px;">
+                                </div>
+                                {% endif %}
+                                
+                                {% if meal.admin_comment %}
+                                <div style="background: var(--cyan); color: var(--white); padding: 8px; border-radius: 5px; font-size: 0.8rem;">
+                                    <strong>Admin Comment:</strong> {{ meal.admin_comment }}
+                                    <br><small>By {{ meal.commented_by.username }} on {{ meal.comment_date|date:"M d, H:i" }}</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div style="color: var(--gray); font-style: italic; text-align: center; padding: 20px;">
+                            No meals logged for this day
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-data">
+                        <h4 style="color: var(--gray);">No logs found</h4>
+                        <p>{{ member.First_Name }} hasn't logged any data in the selected time period.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

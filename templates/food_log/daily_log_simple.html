@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Log - {{ log_date|date:"F d, Y" }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --gray-dark: #0f1531;
+            --blue: #5e50f9;
+            --indigo: #6610f2;
+            --purple: #6a008a;
+            --pink: #e91e63;
+            --red: #f96868;
+            --orange: #f2a654;
+            --yellow: #f6e84e;
+            --green: #46c35f;
+            --teal: #58d8a3;
+            --cyan: #57c7d4;
+            --white: #ffffff;
+            --gray: #434a54;
+            --gray-light: #aab2bd;
+            --gray-lighter: #e8eff4;
+            --gray-lightest: #e6e9ed;
+        }
+
+        body {
+            background-color: var(--gray-lightest);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .page-header {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 6px solid var(--blue);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--indigo) 100%);
+            color: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .meal-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border-left: 6px solid var(--blue);
+        }
+
+        .meal-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .meal-card.breakfast { border-left-color: var(--orange); }
+        .meal-card.lunch { border-left-color: var(--green); }
+        .meal-card.dinner { border-left-color: var(--red); }
+        .meal-card.snack_morning { border-left-color: var(--yellow); }
+        .meal-card.snack_afternoon { border-left-color: var(--cyan); }
+        .meal-card.snack_evening { border-left-color: var(--purple); }
+        .meal-card.other { border-left-color: var(--gray); }
+
+        .meal-type-badge {
+            font-size: 0.85rem;
+            padding: 0.6rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            color: var(--white);
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .breakfast .meal-type-badge { background: var(--orange); }
+        .lunch .meal-type-badge { background: var(--green); }
+        .dinner .meal-type-badge { background: var(--red); }
+        .snack_morning .meal-type-badge { background: var(--yellow); color: var(--gray-dark); }
+        .snack_afternoon .meal-type-badge { background: var(--cyan); }
+        .snack_evening .meal-type-badge { background: var(--purple); }
+        .other .meal-type-badge { background: var(--gray); }
+
+        .meal-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .time-badge {
+            background: var(--gray-lightest);
+            color: var(--gray);
+            font-weight: 600;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .calories-badge {
+            background: var(--yellow);
+            color: var(--gray-dark);
+            font-weight: bold;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .admin-comment {
+            background: var(--cyan);
+            color: var(--white);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .admin-comment h6 {
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .notes-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-left: 6px solid var(--teal);
+        }
+
+        .btn-custom {
+            background: var(--blue);
+            color: var(--white);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background: var(--indigo);
+            color: var(--white);
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            color: var(--blue);
+            border: 2px solid var(--blue);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-custom:hover {
+            background: var(--blue);
+            color: var(--white);
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        .no-meals {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            color: var(--gray);
+        }
+
+        .quick-actions {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .meal-description {
+            color: var(--gray-dark);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .meal-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 style="color: var(--gray-dark); margin: 0;">
+                        <i class="fas fa-calendar-day" style="color: var(--blue);"></i>
+                        Daily Log - {{ log_date|date:"F d, Y" }}
+                    </h2>
+                    <h5 style="color: var(--gray); margin: 10px 0 0 0;">
+                        <i class="fas fa-user-circle" style="color: var(--blue);"></i> 
+                        {{ member.First_Name }} {{ member.Last_Name|default:"" }}
+                    </h5>
+                </div>
+                <a href="{% url 'member_dashboard' member.id %}" class="btn-outline-custom">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="stats-card">
+            <div class="row text-center">
+                <div class="col-4">
+                    <h3 style="margin: 0;">{{ meals.count }}</h3>
+                    <small>Meals Logged</small>
+                </div>
+                <div class="col-4">
+                    {% if daily_log.weight %}
+                        <h3 style="margin: 0;">{{ daily_log.weight }}kg</h3>
+                        <small>Weight Today</small>
+                    {% else %}
+                        <h3 style="margin: 0;">-</h3>
+                        <small>No Weight Logged</small>
+                    {% endif %}
+                </div>
+                <div class="col-4">
+                    <h3 style="margin: 0;">
+                        {% if meals %}
+                            {% for meal in meals %}
+                                {% if meal.calories_estimate %}{{ meal.calories_estimate|add:0 }}{% endif %}
+                            {% empty %}0{% endfor %}
+                        {% else %}0{% endif %}
+                    </h3>
+                    <small>Total Calories</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Notes Section -->
+        {% if daily_log.notes %}
+        <div class="notes-section">
+            <h5 style="color: var(--teal); margin-bottom: 15px;">
+                <i class="fas fa-sticky-note"></i> Daily Notes
+            </h5>
+            <p style="color: var(--gray-dark); margin: 0; line-height: 1.6;">{{ daily_log.notes }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Meals Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 style="color: var(--gray-dark);">
+                        <i class="fas fa-utensils" style="color: var(--green);"></i> 
+                        Meals & Entries
+                    </h4>
+                    <a href="{% url 'add_meal_entry' member.id %}" class="btn-custom">
+                        <i class="fas fa-plus"></i> Add Meal
+                    </a>
+                </div>
+                
+                {% if meals %}
+                    <div class="row">
+                        {% for meal in meals %}
+                        <div class="col-lg-6 col-xl-4 mb-4">
+                            <div class="meal-card {{ meal.meal_type }}">
+                                <!-- Meal Header -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <span class="meal-type-badge">
+                                        {{ meal.get_meal_display_name }}
+                                    </span>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm" style="background: var(--gray-lighter); color: var(--gray);" 
+                                                type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{% url 'edit_meal_entry' member.id meal.id %}">
+                                                <i class="fas fa-edit"></i> Edit</a></li>
+                                            <li><a class="dropdown-item text-danger" href="{% url 'delete_meal_entry' member.id meal.id %}">
+                                                <i class="fas fa-trash"></i> Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Meal Image -->
+                                {% if meal.food_image %}
+                                <div class="mb-3">
+                                    <img src="{{ meal.food_image.url }}" 
+                                         alt="Meal Image" 
+                                         class="meal-image"
+                                         data-bs-toggle="modal" 
+                                         data-bs-target="#imageModal{{ meal.id }}">
+                                </div>
+                                {% endif %}
+
+                                <!-- Meal Meta Info -->
+                                <div class="meal-meta">
+                                    {% if meal.time_consumed %}
+                                    <span class="time-badge">
+                                        <i class="fas fa-clock"></i> {{ meal.time_consumed|time:"g:i A" }}
+                                    </span>
+                                    {% endif %}
+                                    
+                                    {% if meal.calories_estimate %}
+                                    <span class="calories-badge">
+                                        <i class="fas fa-fire"></i> {{ meal.calories_estimate }} cal
+                                    </span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Meal Description -->
+                                <div class="meal-description">
+                                    <h6 style="color: var(--gray); margin-bottom: 8px;">
+                                        <i class="fas fa-list-alt"></i> Description
+                                    </h6>
+                                    <p>{{ meal.meal_description|truncatewords:25 }}</p>
+                                    {% if meal.meal_description|length > 150 %}
+                                        <button class="btn btn-sm" style="background: var(--blue); color: var(--white); padding: 5px 15px;" 
+                                                type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#fullDescription{{ meal.id }}">
+                                            Read more...
+                                        </button>
+                                        <div class="collapse" id="fullDescription{{ meal.id }}">
+                                            <p style="margin-top: 10px;">{{ meal.meal_description }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Admin Comment -->
+                                {% if meal.admin_comment %}
+                                <div class="admin-comment">
+                                    <h6 style="margin-bottom: 8px;">
+                                        <i class="fas fa-user-md"></i> Admin Feedback
+                                    </h6>
+                                    <p style="margin-bottom: 8px;">{{ meal.admin_comment }}</p>
+                                    <small>
+                                        {% if meal.commented_by %}
+                                            By {{ meal.commented_by.get_full_name|default:meal.commented_by.username }}
+                                        {% endif %}
+                                        {% if meal.comment_date %}
+                                            on {{ meal.comment_date|date:"M d, Y g:i A" }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                {% endif %}
+
+                                <!-- Timestamps -->
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--gray-lighter);">
+                                    <small style="color: var(--gray);">
+                                        <i class="fas fa-clock"></i> 
+                                        Added: {{ meal.created_at|date:"M d, g:i A" }}
+                                        {% if meal.updated_at != meal.created_at %}
+                                            <br><i class="fas fa-edit"></i> 
+                                            Updated: {{ meal.updated_at|date:"M d, g:i A" }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Modal -->
+                        {% if meal.food_image %}
+                        <div class="modal fade" id="imageModal{{ meal.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content" style="border-radius: 15px; border: none;">
+                                    <div class="modal-header" style="background: var(--blue); color: var(--white); border-radius: 15px 15px 0 0;">
+                                        <h5 class="modal-title">{{ meal.get_meal_display_name }} - Image</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <img src="{{ meal.food_image.url }}" 
+                                             class="img-fluid rounded" 
+                                             alt="Meal Image">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-meals">
+                        <i class="fas fa-utensils" style="font-size: 4rem; color: var(--gray-light); margin-bottom: 20px;"></i>
+                        <h4 style="color: var(--gray);">No meals logged for this day</h4>
+                        <p style="color: var(--gray-light); margin-bottom: 25px;">Start tracking your nutrition by adding your first meal</p>
+                        <a href="{% url 'add_meal_entry' member.id %}" class="btn-custom">
+                            <i class="fas fa-plus"></i> Add First Meal
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h5 style="color: var(--gray-dark); margin-bottom: 20px;">
+                <i class="fas fa-bolt" style="color: var(--yellow);"></i> Quick Actions
+            </h5>
+            <div class="action-buttons">
+                <a href="{% url 'add_meal_entry' member.id %}" class="btn-custom">
+                    <i class="fas fa-utensils"></i> Add Meal
+                </a>
+                <a href="{% url 'update_weight' member.id %}" class="btn-outline-custom">
+                    <i class="fas fa-weight"></i> Update Weight
+                </a>
+                <a href="{% url 'add_daily_notes' member.id %}" class="btn-outline-custom">
+                    <i class="fas fa-sticky-note"></i> Add Notes
+                </a>
+                <a href="{% url 'member_dashboard' member.id %}" class="btn-outline-custom">
+                    <i class="fas fa-chart-line"></i> View Progress
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Smooth scroll for expanded descriptions
+            document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(el) {
+                el.addEventListener('click', function() {
+                    setTimeout(function() {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 350);
+                });
+            });
+
+            // Calculate total calories dynamically
+            function calculateTotalCalories() {
+                let total = 0;
+                document.querySelectorAll('.calories-badge').forEach(function(badge) {
+                    const calories = parseInt(badge.textContent.match(/\d+/));
+                    if (!isNaN(calories)) {
+                        total += calories;
+                    }
+                });
+                return total;
+            }
+
+            // Add smooth hover animations
+            document.querySelectorAll('.meal-card').forEach(function(card) {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Image loading optimization
+            document.querySelectorAll('.meal-image').forEach(function(img) {
+                img.addEventListener('load', function() {
+                    this.style.opacity = '1';
+                });
+                img.style.opacity = '0';
+                img.style.transition = 'opacity 0.3s ease';
+                img.style.opacity = '1';
+            });
+        });
+    </script>
+</body>
+</html>

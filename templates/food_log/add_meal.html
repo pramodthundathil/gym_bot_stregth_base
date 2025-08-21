@@ -1,0 +1,387 @@
+<!-- templates/food_log/add_meal.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Meal - {{ member.First_Name }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #5a67d8;
+            font-size: 1.8rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+        
+        .nav-links a:hover {
+            background: #5a67d8;
+            color: white;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .meal-form {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .form-header i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .form-header h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group label {
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            background: #f7fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+        }
+        
+        .file-input-label:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .file-input-label i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-time-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .time-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .time-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #feb2b2;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h6><i class="fas fa-plus-circle"></i> Add New Meal</h6>
+        <div class="nav-links">
+            <a href="{% url 'member_dashboard' member.id %}"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="meal-form">
+            <div class="form-header">
+                <i class="fas fa-utensils"></i>
+                <h2>Add Your Meal Entry</h2>
+                <p style="color: #718096;">Record your meal details for {{ today|date:"F d, Y" }}</p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="meal_type">Meal Type *</label>
+                        <select name="meal_type" id="meal_type" required>
+                            <option value="">Select Meal Type</option>
+                            {% for choice in meal_choices %}
+                                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time_consumed">Time Consumed</label>
+                        <input type="time" name="time_consumed" id="time_consumed">
+                        <div class="quick-time-buttons">
+                            <button type="button" class="time-btn" onclick="setCurrentTime()">Now</button>
+                            <button type="button" class="time-btn" onclick="setTime('07:00')">Breakfast</button>
+                            <button type="button" class="time-btn" onclick="setTime('12:00')">Lunch</button>
+                            <button type="button" class="time-btn" onclick="setTime('19:00')">Dinner</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="custom_meal_group" style="display: none;">
+                    <label for="custom_meal_name">Custom Meal Name *</label>
+                    <input type="text" name="custom_meal_name" id="custom_meal_name" placeholder="Enter custom meal name">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="meal_description">Meal Description *</label>
+                    <textarea name="meal_description" id="meal_description" required 
+                              placeholder="Describe what you ate in detail. Include ingredients, cooking method, portion sizes, etc."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="weight">Today's Weight (kg)</label>
+                        <input type="number" name="weight" id="weight" step="0.1" placeholder="e.g., 70.5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="calories_estimate">Estimated Calories</label>
+                        <input type="number" name="calories_estimate" id="calories_estimate" placeholder="e.g., 350">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="daily_notes">Daily Notes (optional)</label>
+                    <textarea name="daily_notes" id="daily_notes" rows="3" 
+                              placeholder="Any additional notes about your day, how you felt, etc."></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Food Image (optional)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="food_image" id="food_image" accept="image/*">
+                        <label for="food_image" class="file-input-label">
+                            <i class="fas fa-camera"></i>
+                            <p>Click to upload food image</p>
+                            <p style="font-size: 0.9rem; color: #718096;">JPG, PNG or GIF (Max 5MB)</p>
+                        </label>
+                    </div>
+                </div>
+
+                <input type="hidden" name="date" value="{{ today }}">
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Meal Entry
+                    </button>
+                    <a href="{% url 'member_dashboard' member.id %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Show/hide custom meal name field
+        document.getElementById('meal_type').addEventListener('change', function() {
+            const customGroup = document.getElementById('custom_meal_group');
+            const customInput = document.getElementById('custom_meal_name');
+            
+            if (this.value === 'other') {
+                customGroup.style.display = 'block';
+                customInput.required = true;
+            } else {
+                customGroup.style.display = 'none';
+                customInput.required = false;
+                customInput.value = '';
+            }
+        });
+
+        // Time helper functions
+        function setCurrentTime() {
+            const now = new Date();
+            const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                              now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('time_consumed').value = timeString;
+        }
+
+        function setTime(time) {
+            document.getElementById('time_consumed').value = time;
+        }
+
+        // Set current time as default
+        setCurrentTime();
+
+        // File input preview
+        document.getElementById('food_image').addEventListener('change', function(e) {
+            const label = document.querySelector('.file-input-label');
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                label.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #48bb78;"></i>
+                    <p style="color: #48bb78;">${fileName} selected</p>
+                    <p style="font-size: 0.9rem; color: #718096;">Click to change image</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

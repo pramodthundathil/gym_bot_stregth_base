@@ -1,0 +1,206 @@
+{% extends 'index.html' %}
+
+{% block title %}{{ enquiry.name }} - Enquiry Details{% endblock %}
+
+{% block content %}
+
+
+<div class="main-panel">
+    <div class="content-wrapper pb-0">
+
+
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-user"></i> Enquiry Details</h2>
+    <div>
+        <a href="{% url 'enquiry_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+        <a href="{% url 'enquiry_update' enquiry.pk %}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Enquiry
+        </a>
+        <a href="{% url 'add_status_update' enquiry.pk %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Add Follow-up
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Enquiry Information -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-info-circle"></i> Basic Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-4"><strong>Name:</strong></div>
+                    <div class="col-sm-8">{{ enquiry.name }}</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Phone:</strong></div>
+                    <div class="col-sm-8">
+                        <a href="tel:{{ enquiry.phone_number }}">{{ enquiry.phone_number }}</a>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Email:</strong></div>
+                    <div class="col-sm-8">
+                        {% if enquiry.email %}
+                            <a href="mailto:{{ enquiry.email }}">{{ enquiry.email }}</a>
+                        {% else %}
+                            <span class="text-muted">Not provided</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Age:</strong></div>
+                    <div class="col-sm-8">
+                        {% if enquiry.age %}
+                            {{ enquiry.age }} years
+                        {% else %}
+                            <span class="text-muted">Not provided</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Information -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-line"></i> Status Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-4"><strong>Current Status:</strong></div>
+                    <div class="col-sm-8">
+                        <span class="badge badge-status status-{{ enquiry.status }}">
+                            {{ enquiry.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Converted:</strong></div>
+                    <div class="col-sm-8">
+                        {% if enquiry.conversion %}
+                            <span class="badge bg-success"><i class="fas fa-check"></i> Yes</span>
+                        {% else %}
+                            <span class="badge bg-warning"><i class="fas fa-clock"></i> Not yet</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Follow-ups:</strong></div>
+                    <div class="col-sm-8">
+                        <span class="badge bg-info">{{ enquiry.number_of_followup }} total</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Last Follow-up:</strong></div>
+                    <div class="col-sm-8">
+                        {% if enquiry.last_follow_up_date %}
+                            {{ enquiry.last_follow_up_date|date:"M d, Y" }}
+                        {% else %}
+                            <span class="text-muted">None</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Next Follow-up:</strong></div>
+                    <div class="col-sm-8">
+                        {% if enquiry.next_follow_up_date %}
+                            {{ enquiry.next_follow_up_date|date:"M d, Y" }}
+                        {% else %}
+                            <span class="text-muted">Not scheduled</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dates -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-calendar"></i> Dates</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-4"><strong>Created:</strong></div>
+                    <div class="col-sm-8">{{ enquiry.date_created|date:"M d, Y" }}</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Last Updated:</strong></div>
+                    <div class="col-sm-8">{{ enquiry.date_updated|date:"M d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Follow-up History -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0"><i class="fas fa-history"></i> Follow-up History</h5>
+        <a href="{% url 'add_status_update' enquiry.pk %}" class="btn btn-sm btn-success">
+            <i class="fas fa-plus"></i> Add New Follow-up
+        </a>
+    </div>
+    <div class="card-body">
+        {% if statuses %}
+            <div class="timeline">
+                {% for status in statuses %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="badge badge-status status-{{ status.status }}">
+                                        {{ status.get_status_display }}
+                                    </span>
+                                    <span class="badge call-status-{{ status.call_status }} ms-2">
+                                        {{ status.get_call_status_display }}
+                                    </span>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> {{ status.date_of_status|date:"M d, Y g:i A" }}
+                                </small>
+                            </div>
+                            <div class="mt-2">
+                                <p class="mb-0">{{ status.description|linebreaks }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-clipboard-list fa-2x text-muted mb-3"></i>
+                <h5 class="text-muted">No follow-up history yet</h5>
+                <p class="text-muted">Add the first follow-up status to track progress.</p>
+                <a href="{% url 'add_status_update' enquiry.pk %}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Add First Follow-up
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+
+    </div>
+</div>
+
+{% endblock %}

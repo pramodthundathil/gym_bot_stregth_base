@@ -1,0 +1,289 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}Daily Logging Dashboard - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --gray-dark: #0f1531;
+        --blue: #5e50f9;
+        --indigo: #6610f2;
+        --purple: #6a008a;
+        --pink: #e91e63;
+        --red: #f96868;
+        --orange: #f2a654;
+        --yellow: #f6e84e;
+        --green: #46c35f;
+        --teal: #58d8a3;
+        --cyan: #57c7d4;
+        --white: #ffffff;
+        --gray: #434a54;
+        --gray-light: #aab2bd;
+        --gray-lighter: #e8eff4;
+        --gray-lightest: #e6e9ed;
+    }
+    
+    .stat-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--blue);
+        margin-bottom: 20px;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--blue);
+        margin: 0;
+    }
+    
+    .stat-label {
+        color: var(--gray);
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+    
+    .activity-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .member-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid var(--gray-lightest);
+        background: var(--white);
+        margin-bottom: 5px;
+        border-radius: 8px;
+    }
+    
+    .member-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .member-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--blue);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-weight: bold;
+    }
+    
+    .btn-custom {
+        background: var(--blue);
+        color: var(--white);
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 0.9rem;
+    }
+    
+    .btn-custom:hover {
+        background: var(--indigo);
+        color: var(--white);
+        text-decoration: none;
+    }
+    
+    .btn-secondary {
+        background: var(--gray-light);
+        color: var(--white);
+    }
+    
+    .btn-secondary:hover {
+        background: var(--gray);
+        color: var(--white);
+    }
+    
+    .alert-info {
+        background: var(--cyan);
+        color: var(--white);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .weight-goal {
+        background: var(--gray-lightest);
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        border-left: 3px solid var(--green);
+    }
+    
+    .page-header {
+        background: var(--white);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .section-title {
+        color: var(--gray-dark);
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+        border-bottom: 2px solid var(--blue);
+        padding-bottom: 5px;
+    }
+</style>
+
+<div class="main-panel">
+    <div class="content-wrapper pb-0">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2 style="color: var(--gray-dark); margin: 0;">Admin Monitoring Dashboard</h2>
+            <p style="color: var(--gray); margin: 5px 0 0 0;">Monitor member food logs and weight tracking</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3 class="stat-number">{{ total_members }}</h3>
+                    <p class="stat-label">Active Members</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: var(--green);">
+                    <h3 class="stat-number" style="color: var(--green);">{{ total_logs_today }}</h3>
+                    <p class="stat-label">Logs Today</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: var(--orange);">
+                    <h3 class="stat-number" style="color: var(--orange);">{{ total_meals_today }}</h3>
+                    <p class="stat-label">Meals Logged Today</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: var(--red);">
+                    <h3 class="stat-number" style="color: var(--red);">{{ members_not_logged.count }}</h3>
+                    <p class="stat-label">Members Not Logged</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="activity-card">
+                    <h4 class="section-title">Quick Actions</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="{% url 'admin_daily_logs_review' %}" class="btn-custom btn-block">Review Daily Logs</a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'admin_member_list' %}" class="btn-custom btn-block">View All Members</a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'admin_daily_logs_review' %}?date={{ end_date|date:'Y-m-d' }}" class="btn-custom btn-block">Today's Activity</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="activity-card">
+                    <h4 class="section-title">Recent Logs (Last 7 Days)</h4>
+                    {% if recent_logs %}
+                        {% for log in recent_logs %}
+                        <div class="member-item">
+                            <div class="member-info">
+                                <div class="member-avatar">
+                                    {{ log.member.First_Name|first }}
+                                </div>
+                                <div>
+                                    <strong>{{ log.member.First_Name }} {{ log.member.Last_Name|default:"" }}</strong>
+                                    <br>
+                                    <small style="color: var(--gray);">
+                                        {{ log.date|date:"M d, Y" }} - {{ log.meals.count }} meal(s)
+                                        {% if log.weight %} | Weight: {{ log.weight }}kg{% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <div>
+                                <a href="{% url 'member_detail_logs' log.member.id %}" class="btn-custom">View Details</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert-info">
+                            No recent logs found for the selected period.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <!-- Members Not Logged Today -->
+                <div class="activity-card">
+                    <h4 class="section-title">Not Logged Today</h4>
+                    {% if members_not_logged %}
+                        {% for member in members_not_logged %}
+                        <div class="member-item">
+                            <div class="member-info">
+                                <div class="member-avatar">
+                                    {{ member.First_Name|first }}
+                                </div>
+                                <div>
+                                    <strong>{{ member.First_Name }} {{ member.Last_Name|default:"" }}</strong>
+                                    <br>
+                                    <small style="color: var(--red);">No log today</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% if members_not_logged.count > 5 %}
+                        <div class="text-center" style="margin-top: 15px;">
+                            <a href="{% url 'admin_member_list' %}" class="btn-secondary">View All Members</a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert-info">
+                            All active members have logged today! 🎉
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Active Weight Goals -->
+                <div class="activity-card">
+                    <h4 class="section-title">Active Weight Goals</h4>
+                    {% if weight_goals %}
+                        {% for goal in weight_goals %}
+                        <div class="weight-goal">
+                            <strong>{{ goal.member.First_Name }} {{ goal.member.Last_Name|default:"" }}</strong>
+                            <br>
+                            <small>Target: {{ goal.target_weight }}kg by {{ goal.target_date|date:"M d, Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert-info">
+                            No active weight goals set.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
