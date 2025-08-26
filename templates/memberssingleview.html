@@ -114,6 +114,72 @@
         </div>
       </div>
 
+
+      <div class="col-xl-12 col-sm-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body px-0 overflow-auto">
+            <h4 class="card-title pl-4">Documents</h4>
+            <div class="container">
+              {% if enrollment_form != None %}
+              <a href="{% url 'membership_detail_admin' enrollment_form.unique_link %}" class="btn btn-outline-info">Enrolment Details</a>
+              {% else %}
+          
+          <button data-bs-toggle="modal" data-bs-target="#shareFormModal" class="btn btn-primary btn-icon-text border ml-3">
+           <i class="mdi mdi-share-variant"></i> Fill Enrollment Form </button>
+
+          <!-- Share Form Modal -->
+          <div class="modal fade" id="shareFormModal" tabindex="-1" role="dialog" aria-labelledby="shareFormModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="shareFormModalLabel">Share Enrollment Form</h5>
+                  <button type="button" class="close btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <label for="enrollmentFormLink">Form Link:</label>
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="enrollmentFormLink" readonly value="{{ request.scheme }}://{{ request.get_host }}/members/enrollment_form/member/{{ member.id }}/">
+                    <button class="btn btn-outline-secondary" type="button" id="copyFormLinkBtn">Copy</button>
+                  </div>
+                  <div class="input-group mb-3">
+                    <a href="{% url 'enrollment_form_existing_member' member.id %}" class="btn btn-info" target="_blank">Fill The form</a>
+                  </div>
+
+                  <span id="copySuccessMsg" style="display:none;color:green;">Copied!</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              var copyBtn = document.getElementById('copyFormLinkBtn');
+              var linkInput = document.getElementById('enrollmentFormLink');
+              var successMsg = document.getElementById('copySuccessMsg');
+              if (copyBtn && linkInput) {
+                copyBtn.addEventListener('click', function () {
+                  linkInput.select();
+                  linkInput.setSelectionRange(0, 99999); // For mobile devices
+                  document.execCommand('copy');
+                  successMsg.style.display = 'inline';
+                  setTimeout(function () {
+                    successMsg.style.display = 'none';
+                  }, 1500);
+                });
+              }
+            });
+          </script>
+
+
+
+
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="col-xl-12 col-sm-12 grid-margin stretch-card">
         <div class="card">
           <div class="card-body px-0 overflow-auto">

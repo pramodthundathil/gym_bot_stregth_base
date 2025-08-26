@@ -67,6 +67,21 @@ urlpatterns = [
     
     # Export CSV
     path('reports/export-unpaid-csv/', views.export_unpaid_members_csv, name='export_unpaid_csv'),
+
+    path("new_enrolment",views.new_enrolment,name="new_enrolment"),
+    
+    path('membership/delete/<int:pk>/', views.membership_detail_delete, name='membership_detail_delete'),
+    path('membership/conversion/<int:pk>/', views.convert_member_form_enrolment, name='convert_member_form_enrolment'),
+
+    
+    path('enrollment_form/member/<int:pk>/',views.enrollment_form_existing_member,name ='enrollment_form_existing_member'),
+    path('enrollment_form/', views.enrollment_form, name='enrollment_form'),
+    path('enroll/', views.enrollment_form, name='enrollment_form'),
+    path('success/<str:unique_link>/', views.enrollment_success, name='enrollment_success'),
+    path('membership/<str:unique_link>/', views.membership_detail, name='membership_detail'),
+    path('membership/admin/<str:unique_link>/', views.membership_detail_admin, name='membership_detail_admin'),
+    path('save-signature/', views.save_signature, name='save_signature'),
+    path('terms/', views.terms_and_conditions, name='terms_and_conditions'),
     
 
     

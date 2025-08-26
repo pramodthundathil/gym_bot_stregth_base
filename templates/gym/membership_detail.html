@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Details - {{ membership.full_name }} - Strength Base Gym</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .detail-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            padding: 3rem;
+            max-width: 1000px;
+        }
+        
+        .member-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+        }
+        
+        .member-header h1 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .membership-id {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 1rem 0;
+        }
+        
+        .section-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border-left: 5px solid #667eea;
+        }
+        
+        .section-title {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-value {
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .badge-custom {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .signature-display {
+            max-width: 300px;
+            max-height: 150px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            background: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 1rem 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .health-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .bmi-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .bmi-normal { background: #28a745; }
+        .bmi-underweight { background: #17a2b8; }
+        .bmi-overweight { background: #ffc107; color: #333; }
+        .bmi-obese { background: #dc3545; }
+        
+        .family-history {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .family-badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+        
+        .family-badge.active {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .addon-services {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .addon-badge {
+            background: #28a745;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .detail-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .member-header {
+                padding: 1.5rem;
+            }
+            
+            .membership-id {
+                font-size: 1.2rem;
+            }
+        }
+        
+        .print-only {
+            display: none;
+        }
+        
+        @media print {
+            body { background: white !important; }
+            .detail-container { box-shadow: none; margin: 0; }
+            .btn { display: none; }
+            .print-only { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="detail-container">
+            <div class="member-header">
+                <h1><i class="fas fa-dumbbell"></i> Strength Base Gym</h1>
+                <h2>{{ membership.full_name }}</h2>
+                <div class="membership-id">ID: {{ membership.unique_link }}</div>
+                <p>Member since: {{ membership.created_at|date:"F d, Y" }}</p>
+                <span class="badge-custom">{{ membership.get_plan_chosen_display }} Plan</span>
+            </div>
+            
+            <!-- Personal Information -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-user"></i> Personal Information
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Full Name</div>
+                        <div class="info-value">{{ membership.full_name }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Date of Birth</div>
+                        <div class="info-value">{{ membership.date_of_birth|date:"F d, Y" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Age</div>
+                        <div class="info-value">{{ membership.age }} years</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Gender</div>
+                        <div class="info-value">{{ membership.get_gender_display }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Mobile Number</div>
+                        <div class="info-value">{{ membership.mobile_number }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">WhatsApp Number</div>
+                        <div class="info-value">{{ membership.whatsapp_number }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">{{ membership.email_id }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Address</div>
+                        <div class="info-value">{{ membership.address }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">City & Pincode</div>
+                        <div class="info-value">{{ membership.city_pincode }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Emergency Contact</div>
+                        <div class="info-value">{{ membership.emergency_contact_name }}<br>{{ membership.emergency_contact_phone }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Health & Medical History -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-heartbeat"></i> Health & Medical History
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Height</div>
+                        <div class="info-value">{{ membership.height_cm }} cm</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Weight</div>
+                        <div class="info-value">{{ membership.weight_kg }} kg</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">BMI</div>
+                        <div class="info-value">
+                            <div class="health-indicator">
+                                <span>{{ membership.bmi }}</span>
+                                <span class="bmi-badge {% if membership.bmi_category == 'Normal weight' %}bmi-normal{% elif membership.bmi_category == 'Underweight' %}bmi-underweight{% elif membership.bmi_category == 'Overweight' %}bmi-overweight{% else %}bmi-obese{% endif %}">
+                                    {{ membership.bmi_category }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Medical Condition</div>
+                        <div class="info-value">
+                            {% if membership.has_medical_condition %}
+                                <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Yes</span>
+                                <br><small>{{ membership.medical_condition_details }}</small>
+                            {% else %}
+                                <span class="text-success"><i class="fas fa-check"></i> None</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Current Medication</div>
+                        <div class="info-value">
+                            {% if membership.taking_medication %}
+                                <span class="text-warning"><i class="fas fa-pills"></i> Yes</span>
+                                <br><small>{{ membership.medication_details }}</small>
+                            {% else %}
+                                <span class="text-success"><i class="fas fa-check"></i> None</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Surgery/Injury History</div>
+                        <div class="info-value">
+                            {% if membership.had_surgery_injury %}
+                                <span class="text-warning"><i class="fas fa-band-aid"></i> Yes</span>
+                                <br><small>{{ membership.surgery_injury_details }}</small>
+                            {% else %}
+                                <span class="text-success"><i class="fas fa-check"></i> None</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Smoking/Alcohol</div>
+                        <div class="info-value">
+                            {% if membership.smokes_drinks_alcohol %}
+                                <span class="text-danger"><i class="fas fa-smoking"></i> Yes</span>
+                            {% else %}
+                                <span class="text-success"><i class="fas fa-check"></i> No</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Family History</div>
+                        <div class="info-value">
+                            <div class="family-history">
+                                <span class="family-badge {% if membership.family_heart_disease %}active{% endif %}">Heart Disease</span>
+                                <span class="family-badge {% if membership.family_diabetes %}active{% endif %}">Diabetes</span>
+                                <span class="family-badge {% if membership.family_hypertension %}active{% endif %}">Hypertension</span>
+                                {% if membership.family_history_none %}
+                                    <span class="family-badge active">None</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fitness Goals -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-bullseye"></i> Fitness Goals & Preferences
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Primary Goal</div>
+                        <div class="info-value">
+                            {{ membership.get_primary_goal_display }}
+                            {% if membership.primary_goal_other %}
+                                <br><small>{{ membership.primary_goal_other }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Preferred Training</div>
+                        <div class="info-value">
+                            {{ membership.get_preferred_training_display }}
+                            {% if membership.preferred_training_other %}
+                                <br><small>{{ membership.preferred_training_other }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Training Frequency</div>
+                        <div class="info-value">{{ membership.get_training_frequency_display }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Preferred Workout Time</div>
+                        <div class="info-value">{{ membership.get_preferred_workout_time_display }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lifestyle -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-life-ring"></i> Lifestyle & Habits
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Occupation</div>
+                        <div class="info-value">{{ membership.get_occupation_display }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Activity Level</div>
+                        <div class="info-value">{{ membership.get_activity_level_display }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Sleep Hours</div>
+                        <div class="info-value">{{ membership.sleep_hours }} hours per day</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Diet Type</div>
+                        <div class="info-value">{{ membership.get_diet_type_display }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Membership & Services -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-credit-card"></i> Membership & Services
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Plan Selected</div>
+                        <div class="info-value">{{ membership.get_plan_chosen_display }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Payment Mode</div>
+                        <div class="info-value">{{ membership.get_payment_mode_display }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Add-on Services</div>
+                        <div class="info-value">
+                            <div class="addon-services">
+                                {% if membership.personal_trainer_addon %}
+                                    <span class="addon-badge">
+                                        <i class="fas fa-user-tie"></i> Personal Trainer
+                                    </span>
+                                {% endif %}
+                                {% if membership.nutrition_plan_addon %}
+                                    <span class="addon-badge">
+                                        <i class="fas fa-apple-alt"></i> Nutrition Plan
+                                    </span>
+                                {% endif %}
+                                {% if membership.physiotherapy_addon %}
+                                    <span class="addon-badge">
+                                        <i class="fas fa-hand-holding-medical"></i> Physiotherapy
+                                    </span>
+                                {% endif %}
+                                {% if not membership.personal_trainer_addon and not membership.nutrition_plan_addon and not membership.physiotherapy_addon %}
+                                    <span class="text-muted">No add-on services selected</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if membership.payment_proof %}
+                    <div class="info-item">
+                        <div class="info-label">Payment Proof</div>
+                        <div class="info-value">
+                            <a href="{{ membership.payment_proof.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-download"></i> View Payment Proof
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Digital Signature & Terms -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-handshake"></i> Agreement & Signature
+                </h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <div class="info-label">Terms Accepted</div>
+                            <div class="info-value">
+                                {% if membership.terms_accepted %}
+                                    <span class="text-success">
+                                        <i class="fas fa-check-circle"></i> Yes
+                                    </span>
+                                    <br><small>Version: {{ membership.terms_version.version }}</small>
+                                {% else %}
+                                    <span class="text-danger">
+                                        <i class="fas fa-times-circle"></i> No
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if membership.signature_timestamp %}
+                        <div class="info-item mt-3">
+                            <div class="info-label">Signed On</div>
+                            <div class="info-value">{{ membership.signature_timestamp|date:"F d, Y g:i A" }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if membership.digital_signature %}
+                        <div class="info-item">
+                            <div class="info-label">Digital Signature</div>
+                            <div class="info-value text-center">
+                                <img src="{{ membership.digital_signature }}" alt="Digital Signature" class="signature-display">
+                                <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#signatureModal">
+                                    <i class="fas fa-expand"></i> View Full Size
+                                </button>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="info-item">
+                            <div class="info-label">Digital Signature</div>
+                            <div class="info-value">
+                                <span class="text-warning">
+                                    <i class="fas fa-exclamation-triangle"></i> Not provided
+                                </span>
+                                <br>
+                                <button class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#signatureModal">
+                                    <i class="fas fa-pen"></i> Add Signature
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Information -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i> System Information
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Enrollment ID</div>
+                        <div class="info-value">{{ membership.enrollment_id }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Unique Link</div>
+                        <div class="info-value">{{ membership.unique_link }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Enrollment Date</div>
+                        <div class="info-value">{{ membership.created_at|date:"F d, Y g:i A" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Last Updated</div>
+                        <div class="info-value">{{ membership.updated_at|date:"F d, Y g:i A" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">
+                            {% if membership.is_active %}
+                                <span class="text-success">
+                                    <i class="fas fa-check-circle"></i> Active
+                                </span>
+                            {% else %}
+                                <span class="text-danger">
+                                    <i class="fas fa-times-circle"></i> Inactive
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="text-center mt-4">
+                <button onclick="window.print()" class="btn btn-primary">
+                    <i class="fas fa-print"></i> Print Details
+                </button>
+                <button onclick="downloadPDF()" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+                <a href="{% url 'enrollment_form' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-plus"></i> New Enrollment
+                </a>
+            </div>
+            
+            <div class="print-only mt-4">
+                <hr>
+                <div class="text-center">
+                    <p><strong>Strength Base Gym</strong></p>
+                    <p>This is a computer generated membership details document.</p>
+                    <p>Generated on: {% now "F d, Y g:i A" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Signature Modal -->
+    <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signatureModalLabel">
+                        {% if membership.digital_signature %}
+                            <i class="fas fa-expand"></i> Digital Signature
+                        {% else %}
+                            <i class="fas fa-pen"></i> Add Digital Signature
+                        {% endif %}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {% if membership.digital_signature %}
+                        <div class="text-center">
+                            <img src="{{ membership.digital_signature }}" alt="Digital Signature" style="max-width: 100%; border: 2px solid #667eea; border-radius: 10px;">
+                            <p class="mt-3">Signed on: {{ membership.signature_timestamp|date:"F d, Y g:i A" }}</p>
+                        </div>
+                    {% else %}
+                        <div class="text-center">
+                            <p>Please sign below to complete your enrollment:</p>
+                            <canvas id="signaturePad" width="600" height="200" style="border: 2px dashed #667eea; border-radius: 10px; cursor: crosshair;"></canvas>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-secondary" onclick="clearSignature()">
+                                    <i class="fas fa-eraser"></i> Clear
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="saveSignature()">
+                                    <i class="fas fa-save"></i> Save Signature
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        {% if not membership.digital_signature %}
+        // Signature Pad Functionality (only if no signature exists)
+        const canvas = document.getElementById('signaturePad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let hasSignature = false;
+        
+        // Set canvas background to white
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        // Touch events for mobile
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchmove', handleTouch);
+        canvas.addEventListener('touchend', stopDrawing);
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(getMousePos(e).x, getMousePos(e).y);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            hasSignature = true;
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#000';
+            
+            ctx.lineTo(getMousePos(e).x, getMousePos(e).y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(getMousePos(e).x, getMousePos(e).y);
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                            e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+        
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+        
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            hasSignature = false;
+        }
+        
+        function saveSignature() {
+            if (!hasSignature) {
+                alert('Please provide your signature before saving.');
+                return;
+            }
+            
+            const signatureData = canvas.toDataURL();
+            
+            // Send signature data to server
+            fetch('{% url "save_signature" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    unique_link: '{{ membership.unique_link }}',
+                    signature: signatureData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Signature saved successfully!');
+                    location.reload();
+                } else {
+                    alert('Error saving signature: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Network error: ' + error);
+            });
+        }
+        {% endif %}
+        
+        function downloadPDF() {
+            // This would require a PDF generation library or server-side PDF generation
+            alert('PDF download functionality would be implemented here. For now, please use the print option.');
+        }
+        
+        // Copy to clipboard functionality
+        document.querySelectorAll('.membership-id, .info-value').forEach(element => {
+            element.addEventListener('dblclick', function() {
+                const text = this.textContent.trim();
+                if (text) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        // Show temporary feedback
+                        const originalBg = this.style.backgroundColor;
+                        this.style.backgroundColor = '#d4edda';
+                        setTimeout(() => {
+                            this.style.backgroundColor = originalBg;
+                        }, 1000);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

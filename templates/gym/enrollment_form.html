@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strength Base Gym - Membership Enrollment</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gray-dark: #0f1531;
+            --blue: #5e50f9;
+            --indigo: #6610f2;
+            --purple: #6a008a;
+            --pink: #e91e63;
+            --red: #f96868;
+            --orange: #f2a654;
+            --yellow: #f6e84e;
+            --green: #46c35f;
+            --teal: #58d8a3;
+            --cyan: #57c7d4;
+            --white: #ffffff;
+            --gray: #434a54;
+            --gray-light: #aab2bd;
+            --gray-lighter: #e8eff4;
+            --gray-lightest: #e6e9ed;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            min-height: 100vh;
+            padding: 0.5rem;
+        }
+
+        .form-container {
+            background: var(--white);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin: 0 auto;
+            padding: 1rem;
+            max-width: 1000px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .gym-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-lighter);
+        }
+
+        .gym-header img {
+            max-width: 100px;
+            height: auto;
+            margin-bottom: 0.5rem;
+        }
+
+        .gym-header h1 {
+            color: var(--blue);
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .gym-header .lead {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Progress indicator for better UX */
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+
+        .progress {
+            height: 6px;
+            border-radius: 10px;
+            background-color: var(--gray-lighter);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin: 1.5rem 0 1.25rem 0;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(94, 80, 249, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-header i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .section-number {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            color: var(--gray-dark);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            display: block;
+            position: relative;
+        }
+
+        .required::after {
+            content: "*";
+            color: var(--red);
+            margin-left: 4px;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.75rem;
+            border: 2px solid var(--gray-lighter);
+            padding: 0.875rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            background-color: var(--white);
+            min-height: 48px; /* Better touch targets for mobile */
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 0.2rem rgba(94, 80, 249, 0.25);
+            outline: none;
+            transform: scale(1.02);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--red);
+            box-shadow: 0 0 0 0.2rem rgba(249, 104, 104, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: var(--gray-light);
+            font-size: 0.85rem;
+        }
+
+        /* Enhanced Radio and Checkbox Styling */
+        .radio-group, .checkbox-group {
+            display: grid;
+            gap: 0.75rem;
+            grid-template-columns: 1fr;
+        }
+
+        .form-check {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 2px solid var(--gray-lighter);
+            transition: all 0.3s ease;
+            background: var(--white);
+            cursor: pointer;
+            position: relative;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-check:hover {
+            border-color: var(--blue);
+            background: linear-gradient(135deg, rgba(94, 80, 249, 0.05), rgba(106, 0, 138, 0.05));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(94, 80, 249, 0.15);
+        }
+
+        .form-check.is-invalid {
+            border-color: var(--red);
+            background: rgba(249, 104, 104, 0.05);
+        }
+
+        .form-check-input {
+            margin-top: 0;
+            margin-right: 0.75rem;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .form-check-input:checked + .form-check-label {
+            color: var(--blue);
+            font-weight: 600;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--blue);
+            border-color: var(--blue);
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+            width: 100%;
+            line-height: 1.4;
+        }
+
+        /* Button Styling */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            border: none;
+            border-radius: 0.75rem;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 0.9rem;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(94, 80, 249, 0.4);
+            background: linear-gradient(135deg, var(--purple), var(--blue));
+        }
+
+        .btn-secondary {
+            background: var(--gray-light);
+            border: none;
+            color: var(--white);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+            min-height: 40px;
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--blue);
+            color: var(--blue);
+            background: transparent;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Enhanced Signature Pad */
+        .signature-container {
+            border: 3px dashed var(--blue);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(94, 80, 249, 0.05), rgba(106, 0, 138, 0.05));
+        }
+
+        .signature-container.is-invalid {
+            border-color: var(--red);
+            background: rgba(249, 104, 104, 0.05);
+        }
+
+        .signature-pad {
+            border: 2px solid var(--gray-lighter);
+            border-radius: 0.75rem;
+            cursor: crosshair;
+            width: 100%;
+            max-width: 100%;
+            height: 200px;
+            background: white;
+        }
+
+        .signature-instructions {
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: rgba(94, 80, 249, 0.1);
+            border-radius: 0.5rem;
+        }
+
+        /* Terms Section */
+        .terms-section {
+            background: var(--gray-lightest);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 2px solid var(--gray-lighter);
+            margin: 1.5rem 0;
+        }
+
+        .terms-section.is-invalid {
+            border-color: var(--red);
+            background: rgba(249, 104, 104, 0.05);
+        }
+
+        .terms-section h5 {
+            color: var(--gray-dark);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .terms-section h5 i {
+            margin-right: 0.5rem;
+            color: var(--blue);
+        }
+
+        .terms-section small {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        .terms-summary {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border-left: 4px solid var(--blue);
+            margin: 1rem 0;
+        }
+
+        .terms-summary ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .terms-summary li {
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        /* Alert Styling */
+        .alert {
+            border-radius: 0.75rem;
+            border: none;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-success {
+            background-color: rgba(70, 195, 95, 0.1);
+            color: var(--green);
+            border-left: 4px solid var(--green);
+        }
+
+        .alert-danger {
+            background-color: rgba(249, 104, 104, 0.1);
+            color: var(--red);
+            border-left: 4px solid var(--red);
+        }
+
+        /* Enhanced Modal */
+        .modal-content {
+            border-radius: 1rem;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: var(--white);
+            border-radius: 1rem 1rem 0 0;
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .terms-content {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--gray);
+        }
+
+        .terms-content p {
+            margin-bottom: 1.25rem;
+        }
+
+        .terms-content strong {
+            color: var(--gray-dark);
+        }
+
+        /* Loading state */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading .btn-primary::after {
+            content: "";
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            margin-left: 0.5rem;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Section completion indicator */
+        .section-complete {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--green);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        /* Form validation feedback */
+        .invalid-feedback {
+            display: block;
+            color: var(--red);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(249, 104, 104, 0.1);
+            border-radius: 0.25rem;
+        }
+
+        /* Help text styling */
+        .form-text {
+            color: var(--gray-light);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive breakpoints */
+        @media (min-width: 480px) {
+            .radio-group, .checkbox-group {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (min-width: 576px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .form-container {
+                padding: 1.5rem;
+            }
+            
+            .gym-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .gym-header img {
+                max-width: 120px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .form-container {
+                padding: 2rem;
+                border-radius: 1.5rem;
+            }
+            
+            .btn-primary {
+                width: auto;
+                min-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .signature-pad {
+                height: 180px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .form-container {
+                padding: 2.5rem;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .form-check {
+                min-height: 52px;
+                padding: 1.25rem;
+            }
+            
+            .btn {
+                min-height: 52px;
+            }
+            
+            .form-control, .form-select {
+                min-height: 52px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            /* Optional: Add dark mode styles if needed */
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white !important;
+            }
+            
+            .form-container {
+                box-shadow: none !important;
+                border: 1px solid #ccc;
+            }
+            
+            .section-header {
+                background: #f8f9fa !important;
+                color: #333 !important;
+            }
+        }
+
+        /* Accessibility improvements */
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        /* Focus indicators for keyboard navigation */
+        .form-check-input:focus,
+        .form-control:focus,
+        .form-select:focus,
+        .btn:focus {
+            outline: 2px solid var(--blue);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="form-container">
+            <div class="gym-header">
+                <img src="{% static 'assets/images/Logo_Reveal_Slides.png' %}" alt="Strength Base Gym Logo" />
+                <h1>Strength Base Gym</h1>
+                <p class="lead">Membership Enrollment Form</p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="progress-container">
+                <div class="progress">
+                    <div class="progress-bar" id="formProgress" style="width: 0%"></div>
+                </div>
+                <small class="text-muted mt-2 d-block text-center">Complete all sections to submit your enrollment</small>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div id="alertContainer">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <form method="post" enctype="multipart/form-data" id="enrollmentForm" novalidate>
+                {% csrf_token %}
+                
+                <!-- Personal Information -->
+                <div class="section-header" data-section="1">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user"></i>
+                        <span>Personal Information</span>
+                    </div>
+                    <div class="section-number">1</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Full Name</label>
+                            {{ form.full_name }}
+                            {% if form.full_name.errors %}
+                                <div class="invalid-feedback">{{ form.full_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="form-group">
+                            <label class="form-label required">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                            {% if form.date_of_birth.errors %}
+                                <div class="invalid-feedback">{{ form.date_of_birth.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="form-group">
+                            <label class="form-label required">Age</label>
+                            {{ form.age }}
+                            <div class="form-text">Auto-calculated from birth date</div>
+                            {% if form.age.errors %}
+                                <div class="invalid-feedback">{{ form.age.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Gender</label>
+                            <div class="radio-group">
+                                {% for radio in form.gender %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.gender.errors %}
+                                <div class="invalid-feedback">{{ form.gender.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Mobile Number</label>
+                            {{ form.mobile_number }}
+                            <div class="form-text">Enter 10-digit mobile number</div>
+                            {% if form.mobile_number.errors %}
+                                <div class="invalid-feedback">{{ form.mobile_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">Address</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                        <div class="invalid-feedback">{{ form.address.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">City & Pincode</label>
+                            {{ form.city_pincode }}
+                            <div class="form-text">e.g., Mumbai - 400001</div>
+                            {% if form.city_pincode.errors %}
+                                <div class="invalid-feedback">{{ form.city_pincode.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">WhatsApp Number</label>
+                            {{ form.whatsapp_number }}
+                            <div class="form-text">For important updates and notifications</div>
+                            {% if form.whatsapp_number.errors %}
+                                <div class="invalid-feedback">{{ form.whatsapp_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Email ID</label>
+                            {{ form.email_id }}
+                            {% if form.email_id.errors %}
+                                <div class="invalid-feedback">{{ form.email_id.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Emergency Contact Name</label>
+                            {{ form.emergency_contact_name }}
+                            {% if form.emergency_contact_name.errors %}
+                                <div class="invalid-feedback">{{ form.emergency_contact_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Emergency Contact Phone</label>
+                            {{ form.emergency_contact_phone }}
+                            <div class="form-text">Someone we can contact in case of emergency</div>
+                            {% if form.emergency_contact_phone.errors %}
+                                <div class="invalid-feedback">{{ form.emergency_contact_phone.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health & Medical History -->
+                <div class="section-header" data-section="2">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>Health & Medical History</span>
+                    </div>
+                    <div class="section-number">2</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6 col-md-4">
+                        <div class="form-group">
+                            <label class="form-label required">Height (cm)</label>
+                            {{ form.height_cm }}
+                            <div class="form-text">e.g., 175</div>
+                            {% if form.height_cm.errors %}
+                                <div class="invalid-feedback">{{ form.height_cm.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="form-group">
+                            <label class="form-label required">Weight (kg)</label>
+                            {{ form.weight_kg }}
+                            <div class="form-text">e.g., 70.5</div>
+                            {% if form.weight_kg.errors %}
+                                <div class="invalid-feedback">{{ form.weight_kg.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Do you have any existing medical condition?</label>
+                            <div class="radio-group">
+                                <div class="form-check radio-option">
+                                    <input class="form-check-input" type="radio" name="has_medical_condition" value="True" id="medical_yes">
+                                    <label class="form-check-label" for="medical_yes">Yes</label>
+                                </div>
+                                <div class="form-check radio-option">
+                                    <input class="form-check-input" type="radio" name="has_medical_condition" value="False" id="medical_no">
+                                    <label class="form-check-label" for="medical_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">If yes, please specify:</label>
+                            {{ form.medical_condition_details }}
+                            <div class="form-text">Describe any chronic conditions, allergies, etc.</div>
+                            {% if form.medical_condition_details.errors %}
+                                <div class="invalid-feedback">{{ form.medical_condition_details.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Are you taking any medication currently?</label>
+                            <div class="radio-group">
+                                <div class="form-check radio-option">
+                                    <input class="form-check-input" type="radio" name="taking_medication" value="True" id="medication_yes">
+                                    <label class="form-check-label" for="medication_yes">Yes</label>
+                                </div>
+                                <div class="form-check radio-option">
+                                    <input class="form-check-input" type="radio" name="taking_medication" value="False" id="medication_no">
+                                    <label class="form-check-label" for="medication_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">If yes, please specify:</label>
+                            {{ form.medication_details }}
+                            <div class="form-text">List all medications with dosage</div>
+                            {% if form.medication_details.errors %}
+                                <div class="invalid-feedback">{{ form.medication_details.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Have you ever had surgery or injury?</label>
+                            <div class="radio-group">
+                                <div class="form-check radio-option">
+                                    <input class="form-check-input" type="radio" name="had_surgery_injury" value="True" id="surgery_yes">
+                                    <label class="form-check-label" for="surgery_yes">Yes</label>
+                                </div>
+                                <div class="form-check radio-option">
+                                    <input class="form-check-input" type="radio" name="had_surgery_injury" value="False" id="surgery_no">
+                                    <label class="form-check-label" for="surgery_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">If yes, explain:</label>
+                            {{ form.surgery_injury_details }}
+                            <div class="form-text">Include type of surgery/injury and recovery status</div>
+                            {% if form.surgery_injury_details.errors %}
+                                <div class="invalid-feedback">{{ form.surgery_injury_details.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Do you smoke or consume alcohol?</label>
+                            <div class="radio-group">
+                                <div class="form-check radio-option">
+                                    <input class="form-check-input" type="radio" name="smokes_drinks_alcohol" value="True" id="smoke_drink_yes">
+                                    <label class="form-check-label" for="smoke_drink_yes">Yes</label>
+                                </div>
+                                <div class="form-check radio-option">
+                                    <input class="form-check-input" type="radio" name="smokes_drinks_alcohol" value="False" id="smoke_drink_no">
+                                    <label class="form-check-label" for="smoke_drink_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Family History (Check all that apply):</label>
+                    <div class="checkbox-group">
+                        <div class="form-check checkbox-option">
+                            {{ form.family_heart_disease }}
+                            <label class="form-check-label" for="{{ form.family_heart_disease.id_for_label }}">Heart Disease</label>
+                        </div>
+                        <div class="form-check checkbox-option">
+                            {{ form.family_diabetes }}
+                            <label class="form-check-label" for="{{ form.family_diabetes.id_for_label }}">Diabetes</label>
+                        </div>
+                        <div class="form-check checkbox-option">
+                            {{ form.family_hypertension }}
+                            <label class="form-check-label" for="{{ form.family_hypertension.id_for_label }}">Hypertension</label>
+                        </div>
+                        <div class="form-check checkbox-option">
+                            {{ form.family_history_none }}
+                            <label class="form-check-label" for="{{ form.family_history_none.id_for_label }}">None of the above</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fitness Goals -->
+                <div class="section-header" data-section="3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-bullseye"></i>
+                        <span>Fitness Goals</span>
+                    </div>
+                    <div class="section-number">3</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-lg-8">
+                        <div class="form-group">
+                            <label class="form-label required">Primary Goal</label>
+                            <div class="radio-group">
+                                {% for radio in form.primary_goal %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.primary_goal.errors %}
+                                <div class="invalid-feedback">{{ form.primary_goal.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div class="form-group">
+                            <label class="form-label">If Other, specify:</label>
+                            {{ form.primary_goal_other }}
+                            {% if form.primary_goal_other.errors %}
+                                <div class="invalid-feedback">{{ form.primary_goal_other.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-lg-8">
+                        <div class="form-group">
+                            <label class="form-label required">Preferred Training</label>
+                            <div class="radio-group">
+                                {% for radio in form.preferred_training %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.preferred_training.errors %}
+                                <div class="invalid-feedback">{{ form.preferred_training.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div class="form-group">
+                            <label class="form-label">If Other, specify:</label>
+                            {{ form.preferred_training_other }}
+                            {% if form.preferred_training_other.errors %}
+                                <div class="invalid-feedback">{{ form.preferred_training_other.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Training Frequency</label>
+                            <div class="radio-group">
+                                {% for radio in form.training_frequency %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.training_frequency.errors %}
+                                <div class="invalid-feedback">{{ form.training_frequency.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Preferred Workout Time</label>
+                            <div class="radio-group">
+                                {% for radio in form.preferred_workout_time %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.preferred_workout_time.errors %}
+                                <div class="invalid-feedback">{{ form.preferred_workout_time.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lifestyle & Habits -->
+                <div class="section-header" data-section="4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-life-ring"></i>
+                        <span>Lifestyle & Habits</span>
+                    </div>
+                    <div class="section-number">4</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Occupation</label>
+                            <div class="radio-group">
+                                {% for radio in form.occupation %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.occupation.errors %}
+                                <div class="invalid-feedback">{{ form.occupation.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Activity Level</label>
+                            <div class="radio-group">
+                                {% for radio in form.activity_level %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.activity_level.errors %}
+                                <div class="invalid-feedback">{{ form.activity_level.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Sleep Hours (per day)</label>
+                            {{ form.sleep_hours }}
+                            <div class="form-text">Average hours of sleep per night (e.g., 7)</div>
+                            {% if form.sleep_hours.errors %}
+                                <div class="invalid-feedback">{{ form.sleep_hours.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Diet</label>
+                            <div class="radio-group">
+                                {% for radio in form.diet_type %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.diet_type.errors %}
+                                <div class="invalid-feedback">{{ form.diet_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Membership Selection -->
+                <div class="section-header" data-section="5">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Membership Selection</span>
+                    </div>
+                    <div class="section-number">5</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <div class="form-group">
+                            <label class="form-label required">Plan Chosen</label>
+                            <div class="radio-group">
+                                {% for radio in form.plan_chosen %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.plan_chosen.errors %}
+                                <div class="invalid-feedback">{{ form.plan_chosen.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="form-group">
+                            <label class="form-label">Add-on Services:</label>
+                            <div class="checkbox-group">
+                                <div class="form-check checkbox-option">
+                                    {{ form.personal_trainer_addon }}
+                                    <label class="form-check-label" for="{{ form.personal_trainer_addon.id_for_label }}">Personal Trainer</label>
+                                </div>
+                                <div class="form-check checkbox-option">
+                                    {{ form.nutrition_plan_addon }}
+                                    <label class="form-check-label" for="{{ form.nutrition_plan_addon.id_for_label }}">Nutrition Plan</label>
+                                </div>
+                                <div class="form-check checkbox-option">
+                                    {{ form.physiotherapy_addon }}
+                                    <label class="form-check-label" for="{{ form.physiotherapy_addon.id_for_label }}">Physiotherapy / Rehab</label>
+                                </div>
+                            </div>
+                            <div class="form-text">Select additional services you're interested in</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment & Agreement -->
+                <div class="section-header" data-section="6">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-handshake"></i>
+                        <span>Payment & Agreement</span>
+                    </div>
+                    <div class="section-number">6</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label required">Payment Mode</label>
+                            <div class="radio-group">
+                                {% for radio in form.payment_mode %}
+                                    <div class="form-check radio-option">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.payment_mode.errors %}
+                                <div class="invalid-feedback">{{ form.payment_mode.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Upload Payment Proof (optional):</label>
+                            {{ form.payment_proof }}
+                            <div class="form-text">Upload screenshot if you made online transfer</div>
+                            {% if form.payment_proof.errors %}
+                                <div class="invalid-feedback">{{ form.payment_proof.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Digital Signature -->
+                <div class="form-group">
+                    <label class="form-label required">Digital Signature</label>
+                    <div class="signature-instructions">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Please sign below using your finger (mobile) or mouse (desktop)</strong><br>
+                        Your signature confirms agreement to all terms and conditions
+                    </div>
+                    <div class="signature-container" id="signatureContainer">
+                        <canvas id="signaturePad" class="signature-pad" width="600" height="200"></canvas>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="clearSignature()">
+                                <i class="fas fa-eraser"></i> Clear Signature
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Hidden field to store signature data -->
+                    <input type="hidden" name="digital_signature" id="signatureData">
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="terms-section" id="termsSection">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                        <h5><i class="fas fa-scroll"></i> Terms & Conditions</h5>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#termsModal">
+                            <i class="fas fa-eye"></i> View Full Terms
+                        </button>
+                    </div>
+
+                    <div class="terms-summary">
+                        <h6 class="mb-3"><i class="fas fa-clipboard-list me-2"></i>Key Points:</h6>
+                        <ul>
+                            <li>All fees are <strong>non-refundable</strong></li>
+                            <li>I declare I am <strong>medically fit</strong> to exercise</li>
+                            <li>I will <strong>follow safety rules</strong> and gym etiquette</li>
+                            <li>The gym is <strong>not liable</strong> for injuries if safety rules are ignored</li>
+                            <li>Memberships are <strong>non-transferable</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="form-check">
+                        {{ form.terms_accepted }}
+                        <label class="form-check-label" for="{{ form.terms_accepted.id_for_label }}">
+                            <strong>I confirm that all details provided are correct and I accept the terms and conditions.</strong>
+                        </label>
+                    </div>
+                    {% if form.terms_accepted.errors %}
+                        <div class="invalid-feedback">{{ form.terms_accepted.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Hidden field for terms version -->
+                {{ form.terms_version }}
+
+                <!-- Submit Button -->
+                <div class="text-center mt-5">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        Submit Enrollment
+                    </button>
+                    <div class="form-text mt-2">
+                        Please review all information before submitting
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Terms & Conditions Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsModalLabel">
+                        <i class="fas fa-scroll me-2"></i> Terms and Conditions
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if terms %}
+                        <h6>{{ terms.title }} - Version {{ terms.version }}</h6>
+                        <div class="terms-content">
+                            {{ terms.content|linebreaks }}
+                        </div>
+                    {% else %}
+                        <div class="terms-content">
+                            <p><strong>Non-Refundable</strong> – All payments made for membership, packages, and personal training sessions are strictly non-refundable and non-transferable.</p>
+                            <p><strong>Validity Period</strong> – Packages and memberships are valid only for the duration mentioned at the time of purchase. Expired sessions/memberships cannot be extended without renewal.</p>
+                            <p><strong>Session Cancellation</strong> – Personal Training sessions require at least 24 hours' notice for rescheduling. Missed sessions without notice will be counted as used.</p>
+                            <p><strong>Medical Responsibility</strong> – Members are responsible for disclosing any medical conditions before starting training. Strength Base Gym and its trainers are not liable for injuries caused due to undisclosed conditions or non-compliance with trainer instructions.</p>
+                            <p><strong>Code of Conduct</strong> – Members must maintain discipline, follow gym etiquette, and respect staff and other members.</p>
+                            <p><strong>Transfer Policy</strong> – Memberships and packages are not transferable to another person unless explicitly stated.</p>
+                            <p><strong>Changes</strong> – Strength Base Gym reserves the right to modify membership fees, schedules, trainers, and services at any time.</p>
+                            <p><strong>Safety Rules</strong> – Members must follow all safety guidelines and equipment usage instructions provided by gym staff.</p>
+                            <p><strong>Privacy</strong> – Your personal information will be kept confidential and used only for gym-related purposes.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="acceptTerms()">
+                        <i class="fas fa-check me-2"></i> I Accept
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Progress tracking
+        function updateProgress() {
+            const sections = document.querySelectorAll('.section-header');
+            let completedSections = 0;
+            
+            sections.forEach((section, index) => {
+                const sectionNum = index + 1;
+                const isComplete = checkSectionCompletion(sectionNum);
+                
+                if (isComplete) {
+                    completedSections++;
+                    if (!section.querySelector('.section-complete')) {
+                        const completeIcon = document.createElement('div');
+                        completeIcon.className = 'section-complete';
+                        completeIcon.innerHTML = '<i class="fas fa-check"></i>';
+                        section.appendChild(completeIcon);
+                    }
+                }
+            });
+            
+            const progress = (completedSections / sections.length) * 100;
+            document.getElementById('formProgress').style.width = progress + '%';
+        }
+
+        function checkSectionCompletion(sectionNum) {
+            // Basic validation for each section
+            const requiredFields = {
+                1: ['full_name', 'date_of_birth', 'age', 'gender', 'mobile_number', 'address', 'city_pincode', 'whatsapp_number', 'email_id', 'emergency_contact_name', 'emergency_contact_phone'],
+                2: ['height_cm', 'weight_kg', 'has_medical_condition', 'taking_medication', 'had_surgery_injury', 'smokes_drinks_alcohol'],
+                3: ['primary_goal', 'preferred_training', 'training_frequency', 'preferred_workout_time'],
+                4: ['occupation', 'activity_level', 'sleep_hours', 'diet_type'],
+                5: ['plan_chosen', 'payment_mode'],
+                6: ['terms_accepted']
+            };
+
+            const fields = requiredFields[sectionNum] || [];
+            return fields.every(fieldName => {
+                const field = document.querySelector(`[name="${fieldName}"]`);
+                if (!field) return true;
+                
+                if (field.type === 'radio') {
+                    return document.querySelector(`[name="${fieldName}"]:checked`);
+                } else if (field.type === 'checkbox') {
+                    return field.checked;
+                } else {
+                    return field.value.trim() !== '';
+                }
+            });
+        }
+
+        // Signature Pad Functionality
+        const canvas = document.getElementById('signaturePad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let hasSignature = false;
+
+        // Set canvas size responsively
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const rect = container.getBoundingClientRect();
+            canvas.width = Math.min(600, rect.width - 40);
+            canvas.height = window.innerWidth < 768 ? 200 : 180;
+            
+            // Set canvas background to white
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+
+        // Initial resize
+        resizeCanvas();
+        
+        // Resize on window resize
+        window.addEventListener('resize', resizeCanvas);
+
+        // Mouse events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        // Touch events for mobile
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchmove', handleTouch);
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function startDrawing(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            const pos = getMousePos(e);
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            hasSignature = true;
+            const pos = getMousePos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            
+            updateProgress();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' :
+                e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            hasSignature = false;
+            document.getElementById('signatureData').value = '';
+            updateProgress();
+        }
+
+        function acceptTerms() {
+            document.getElementById('{{ form.terms_accepted.id_for_label }}').checked = true;
+            updateProgress();
+        }
+
+        // Auto-calculate age from date of birth
+        const dobField = document.querySelector('input[name="date_of_birth"]');
+        const ageField = document.querySelector('input[name="age"]');
+        
+        if (dobField && ageField) {
+            dobField.addEventListener('change', function () {
+                const birthDate = new Date(this.value);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                ageField.value = age >= 0 ? age : '';
+                updateProgress();
+            });
+        }
+
+        // Family history exclusive "None" checkbox
+        const familyNoneCheckbox = document.getElementById('{{ form.family_history_none.id_for_label }}');
+        const familyCheckboxes = [
+            document.getElementById('{{ form.family_heart_disease.id_for_label }}'),
+            document.getElementById('{{ form.family_diabetes.id_for_label }}'),
+            document.getElementById('{{ form.family_hypertension.id_for_label }}')
+        ].filter(el => el !== null);
+
+        if (familyNoneCheckbox) {
+            familyNoneCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    familyCheckboxes.forEach(cb => cb.checked = false);
+                }
+            });
+
+            familyCheckboxes.forEach(checkbox => {
+                if (checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked && familyNoneCheckbox) {
+                            familyNoneCheckbox.checked = false;
+                        }
+                    });
+                }
+            });
+        }
+
+        // Add event listeners to all form inputs for progress tracking
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('change', updateProgress);
+                input.addEventListener('input', updateProgress);
+            });
+
+            // Initial progress check
+            updateProgress();
+
+            // Auto-hide alerts after 7 seconds
+            setTimeout(() => {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    if (alert.classList.contains('show')) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
+                });
+            }, 7000);
+
+            // Smooth scrolling for better mobile experience
+            const sectionHeaders = document.querySelectorAll('.section-header');
+            sectionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const nextElement = this.nextElementSibling;
+                    if (nextElement) {
+                        nextElement.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start',
+                            inline: 'nearest'
+                        });
+                    }
+                });
+            });
+        });
+
+        // Form submission with enhanced validation
+        document.getElementById('enrollmentForm').addEventListener('submit', function (e) {
+            // Clear previous error states
+            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            
+            let hasErrors = false;
+            let firstErrorElement = null;
+
+            // Validate signature
+            if (!hasSignature) {
+                hasErrors = true;
+                document.getElementById('signatureContainer').classList.add('is-invalid');
+                if (!firstErrorElement) firstErrorElement = document.getElementById('signatureContainer');
+                showAlert('Please provide your digital signature before submitting the form.', 'danger');
+            }
+
+            // Validate terms acceptance
+            const termsCheckbox = document.querySelector('[name="terms_accepted"]');
+            if (!termsCheckbox.checked) {
+                hasErrors = true;
+                document.getElementById('termsSection').classList.add('is-invalid');
+                if (!firstErrorElement) firstErrorElement = document.getElementById('termsSection');
+                showAlert('Please accept the terms and conditions to continue.', 'danger');
+            }
+
+            // Check for other validation errors
+            const invalidFields = document.querySelectorAll('.form-control:invalid, .form-select:invalid');
+            if (invalidFields.length > 0) {
+                hasErrors = true;
+                invalidFields.forEach(field => field.classList.add('is-invalid'));
+                if (!firstErrorElement) firstErrorElement = invalidFields[0];
+            }
+
+            if (hasErrors) {
+                e.preventDefault();
+                if (firstErrorElement) {
+                    firstErrorElement.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                }
+                return;
+            }
+
+            // Store signature data before submission
+            const signatureData = canvas.toDataURL();
+            document.getElementById('signatureData').value = signatureData;
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+
+            // Show success message
+            showAlert('Form is being submitted. Please wait...', 'info');
+        });
+
+        function showAlert(message, type) {
+            const alertHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = alertHTML;
+            alertContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Enhanced form validation feedback
+        function addRealTimeValidation() {
+            const requiredFields = document.querySelectorAll('input[required], select[required], textarea[required]');
+            
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', function() {
+                    if (!this.value.trim()) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+
+                field.addEventListener('input', function() {
+                    if (this.classList.contains('is-invalid') && this.value.trim()) {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+
+            // Email validation
+            const emailField = document.querySelector('[name="email_id"]');
+            if (emailField) {
+                emailField.addEventListener('blur', function() {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (this.value && !emailRegex.test(this.value)) {
+                        this.classList.add('is-invalid');
+                        showFieldError(this, 'Please enter a valid email address');
+                    }
+                });
+            }
+
+            // Phone number validation
+            const phoneFields = document.querySelectorAll('[name="mobile_number"], [name="whatsapp_number"], [name="emergency_contact_phone"]');
+            phoneFields.forEach(field => {
+                field.addEventListener('input', function() {
+                    // Allow only numbers
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    if (this.value.length > 10) {
+                        this.value = this.value.slice(0, 10);
+                    }
+                });
+
+                field.addEventListener('blur', function() {
+                    if (this.value && this.value.length !== 10) {
+                        this.classList.add('is-invalid');
+                        showFieldError(this, 'Please enter a valid 10-digit phone number');
+                    }
+                });
+            });
+        }
+
+        function showFieldError(field, message) {
+            // Remove existing error message
+            const existingError = field.parentNode.querySelector('.invalid-feedback');
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Add new error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback';
+            errorDiv.textContent = message;
+            field.parentNode.appendChild(errorDiv);
+        }
+
+        // Initialize real-time validation
+        document.addEventListener('DOMContentLoaded', function() {
+            addRealTimeValidation();
+        });
+
+        // Accessibility improvements
+        document.addEventListener('keydown', function(e) {
+            // Allow form submission with Ctrl+Enter
+            if (e.ctrlKey && e.key === 'Enter') {
+                const submitBtn = document.getElementById('submitBtn');
+                if (!submitBtn.disabled) {
+                    submitBtn.click();
+                }
+            }
+        });
+
+        // Auto-save to localStorage (optional)
+        function autoSave() {
+            const formData = new FormData(document.getElementById('enrollmentForm'));
+            const dataObject = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key !== 'digital_signature' && key !== 'payment_proof') {
+                    dataObject[key] = value;
+                }
+            }
+            
+            try {
+                localStorage.setItem('gym_enrollment_draft', JSON.stringify(dataObject));
+            } catch (e) {
+                // localStorage not available or full
+                console.log('Could not save form data locally');
+            }
+        }
+
+        // Load saved data (optional)
+        function loadSavedData() {
+            try {
+                const savedData = localStorage.getItem('gym_enrollment_draft');
+                if (savedData) {
+                    const dataObject = JSON.parse(savedData);
+                    
+                    Object.keys(dataObject).forEach(key => {
+                        const field = document.querySelector(`[name="${key}"]`);
+                        if (field && field.type !== 'file') {
+                            if (field.type === 'radio' || field.type === 'checkbox') {
+                                if (field.value === dataObject[key] || dataObject[key] === 'on') {
+                                    field.checked = true;
+                                }
+                            } else {
+                                field.value = dataObject[key];
+                            }
+                        }
+                    });
+                    
+                    updateProgress();
+                }
+            } catch (e) {
+                console.log('Could not load saved form data');
+            }
+        }
+
+        // Debounced auto-save
+        let saveTimeout;
+        function debouncedAutoSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(autoSave, 2000);
+        }
+
+        // Add auto-save listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load any saved data
+            loadSavedData();
+            
+            // Set up auto-save
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('change', debouncedAutoSave);
+                input.addEventListener('input', debouncedAutoSave);
+            });
+        });
+
+        // Clear saved data on successful submission
+        window.addEventListener('beforeunload', function() {
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn.disabled) {
+                // Form is being submitted, clear saved data
+                try {
+                    localStorage.removeItem('gym_enrollment_draft');
+                } catch (e) {
+                    console.log('Could not clear saved data');
+                }
+            }
+        });
+
+        // Mobile-specific improvements
+        if (window.innerWidth < 768) {
+            // Adjust input types for better mobile keyboards
+            document.addEventListener('DOMContentLoaded', function() {
+                const phoneFields = document.querySelectorAll('[name="mobile_number"], [name="whatsapp_number"], [name="emergency_contact_phone"]');
+                phoneFields.forEach(field => {
+                    field.setAttribute('inputmode', 'numeric');
+                    field.setAttribute('pattern', '[0-9]*');
+                });
+
+                const emailField = document.querySelector('[name="email_id"]');
+                if (emailField) {
+                    emailField.setAttribute('inputmode', 'email');
+                }
+
+                const numberFields = document.querySelectorAll('[name="age"], [name="height_cm"], [name="weight_kg"], [name="sleep_hours"]');
+                numberFields.forEach(field => {
+                    field.setAttribute('inputmode', 'numeric');
+                });
+            });
+        }
+
+        // Performance optimization for mobile
+        let ticking = false;
+        function requestTick() {
+            if (!ticking) {
+                requestAnimationFrame(updateProgress);
+                ticking = true;
+            }
+        }
+
+        // Intersection Observer for better mobile performance
+        if ('IntersectionObserver' in window) {
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '50px'
+            });
+
+            document.querySelectorAll('.section-header').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                sectionObserver.observe(section);
+            });
+        }
+    </script>
+</body>
+</html>

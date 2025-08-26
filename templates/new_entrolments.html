@@ -1,0 +1,175 @@
+{% extends "index.html" %}
+{% load static %}
+{% static "images" as baseurl %}
+
+
+{% block content %}
+
+<style>
+  .memberadd-form textarea {
+    width: 100%;
+    border: 1px solid #ebedf2;
+  }
+
+  .list-card {
+    position: relative;
+    /* display: inline-block; */
+    /* border-bottom: 1px dotted black; */
+  }
+
+  .list-card .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 10%;
+  }
+
+  .list-card:hover .tooltiptext {
+    visibility: visible;
+  }
+</style>
+
+<div class="main-panel">
+  <div class="content-wrapper pb-0">
+    {% for message in messages %}
+
+    <div class="alert {{message.tags}} alert-dismissible fade show " style="position:fixed;top:100px;z-index:1;"
+      role="alert">
+      <strong>Information!</strong> {{message}}
+      <button type="button" class="btn btn-close mdi mdi-close text-xxl" data-dismiss="alert"
+        aria-label="Close"></button>
+    </div>
+    {% endfor %}
+
+    <div class="page-header flex-wrap">
+      <h3 class="mb-0"> Enrollments <span class="pl-0 h6 pl-sm-2 text-muted d-inline-block"></span>
+      </h3>
+
+      <div class="d-flex">
+        <button data-bs-toggle="modal" data-bs-target="#shareFormModal" class="btn btn-primary btn-icon-text border ml-3">
+           <i class="mdi mdi-share-variant"></i> Share Form </button>
+
+          <!-- Share Form Modal -->
+          <div class="modal fade" id="shareFormModal" tabindex="-1" role="dialog" aria-labelledby="shareFormModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="shareFormModalLabel">Share Enrollment Form</h5>
+                  <button type="button" class="close btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <label for="enrollmentFormLink">Form Link:</label>
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="enrollmentFormLink" readonly value="{{ request.scheme }}://{{ request.get_host }}/members/enrollment_form/">
+                    <button class="btn btn-outline-secondary" type="button" id="copyFormLinkBtn">Copy</button>
+                  </div>
+                  <span id="copySuccessMsg" style="display:none;color:green;">Copied!</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              var copyBtn = document.getElementById('copyFormLinkBtn');
+              var linkInput = document.getElementById('enrollmentFormLink');
+              var successMsg = document.getElementById('copySuccessMsg');
+              if (copyBtn && linkInput) {
+                copyBtn.addEventListener('click', function () {
+                  linkInput.select();
+                  linkInput.setSelectionRange(0, 99999); // For mobile devices
+                  document.execCommand('copy');
+                  successMsg.style.display = 'inline';
+                  setTimeout(function () {
+                    successMsg.style.display = 'none';
+                  }, 1500);
+                });
+              }
+            });
+          </script>
+      </div>
+    </div>
+
+
+      <div class="row">
+      <div class="col-xl-12 col-sm-6 grid-margin stretch-card">
+        <div class="card" style="padding: 20px !important;">
+          <div class="card-body px-0 overflow-auto">
+            <h4 class="card-title pl-4">Members</h4>
+            <div class="table-responsive">
+              <table class="table" id="memberTable">
+                <thead class="bg-light">
+                  <tr>
+                    <th>Sl no</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Plan</th>
+                    <th>Status</th>
+                    <th>View</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for sub in enrolment_data %}
+                  <tr>
+                    <th>{{ forloop.counter }}</th>
+                    <td>{{ sub.full_name }}</td>
+                    <td>{{ sub.mobile_number }}</td>
+                    <td>{{ sub.get_plan_chosen_display }}</td>
+                    <td>
+                      {% if sub.is_active %}
+                        <span class="badge badge-inverse-success">Active</span>
+                      {% else %}
+                        <span class="badge badge-inverse-danger">Inactive</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{% url 'membership_detail_admin' sub.unique_link %}" class="btn btn-outline-info">View</a>
+                      <a href="{% url 'membership_detail_delete' sub.id %}" onclick="return confirm('Are you sure you want to delete this membership?');" class="btn btn-outline-danger">Delete</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <a class="text-black mt-3 d-block pl-4" href="#">
+              <!-- <span class="font-weight-medium h6">View all Members</span> -->
+              <!-- <i class="mdi mdi-chevron-right"></i></a> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+</div>
+
+<!-- jQuery (must be loaded first) -->
+<script src="{%static 'assets\js\jquery-3.6.0.min.js' %}"></script>
+
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="{%static 'assets\css\jquery.dataTables.min.css' %}">
+
+<!-- DataTables JS (load after jQuery) -->
+<script src="{%static 'assets\js\jquery.dataTables.min.js' %}"></script>
+
+<script>
+  $(document).ready(function () {
+    if ($.fn.DataTable) {
+      console.log("DataTable is loaded.");
+      $('#memberTable').DataTable();
+    } else {
+      console.error("DataTable is not loaded.");
+    }
+  });
+</script>
+{% endblock %}

@@ -225,7 +225,10 @@ def MembersSingleView(request,pk):
         access.save()
     sub_form = SubscriptionAddForm()
     payments = Payment.objects.filter(Member = member)
-    
+    try:
+        enrollment_form = member.enrolment_form.all().first()
+    except:
+        enrollment_form = None
 
     context = {
         "member":member,
@@ -233,7 +236,8 @@ def MembersSingleView(request,pk):
         'sub_form':sub_form,
         "access":access,
         "notification_payments":notification_payments,
-        "payments":payments
+        "payments":payments,
+        "enrollment_form":enrollment_form
 
     }
     return render(request,"memberssingleview.html",context)
@@ -1616,3 +1620,215 @@ def update_member_status(request, member_id):
             return JsonResponse({'success': False, 'error': 'Record not found'})
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+
+# new update for strgethbase gym membershipforms and others 
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
+from django.urls import reverse
+from .models import GymMembership, TermsAndConditions
+from .forms import GymMembershipForm
+import json
+import base64
+from datetime import datetime
+from django.core.mail import send_mail
+from django.conf import settings
+
+def enrollment_form(request):
+    """Display the gym membership enrollment form"""
+    if request.method == 'POST':
+        form = GymMembershipForm(request.POST, request.FILES)
+        if form.is_valid():
+            membership = form.save(commit=False)
+            
+            # Set the latest terms version
+            latest_terms = TermsAndConditions.objects.filter(is_active=True).first()
+            if latest_terms:
+                membership.terms_version = latest_terms
+            
+            membership.save()
+            
+            # Send confirmation email (optional)
+            try:
+                send_confirmation_email(membership)
+            except:
+                pass  # Email sending is optional
+            
+            messages.success(request, f'Enrollment successful! Your unique ID is: {membership.unique_link}')
+            return redirect('enrollment_success', unique_link=membership.unique_link)
+    else:
+        form = GymMembershipForm()
+    
+    # Get latest terms and conditions
+    terms = TermsAndConditions.objects.filter(is_active=True).first()
+    
+    context = {
+        'form': form,
+        'terms': terms,
+    }
+    return render(request, 'gym/enrollment_form.html', context)
+
+def enrollment_success(request, unique_link):
+    """Display enrollment success page"""
+    membership = get_object_or_404(GymMembership, unique_link=unique_link)
+    return render(request, 'gym/enrollment_success.html', {'membership': membership})
+
+def membership_detail(request, unique_link):
+    """Display membership details"""
+    membership = get_object_or_404(GymMembership, unique_link=unique_link)
+    return render(request, 'gym/membership_detail.html', {'membership': membership})
+
+
+def membership_detail_admin(request, unique_link):
+    """Display membership details"""
+    membership = get_object_or_404(GymMembership, unique_link=unique_link)
+    return render(request, 'gym/membership_detail_admin.html', {'membership': membership})
+
+def membership_detail_delete(request,pk):
+    member_ship = get_object_or_404(GymMembership, id = pk)
+    member_ship.delete()
+    messages.success(request,"membership entrolment deleted")
+    return redirect(new_enrolment) 
+
+@csrf_exempt
+def save_signature(request):
+    """Save digital signature via AJAX"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            unique_link = data.get('unique_link')
+            signature_data = data.get('signature')
+            
+            if not unique_link or not signature_data:
+                return JsonResponse({'success': False, 'error': 'Missing data'})
+            
+            membership = GymMembership.objects.get(unique_link=unique_link)
+            membership.digital_signature = signature_data
+            membership.signature_timestamp = datetime.now()
+            membership.save()
+            
+            return JsonResponse({'success': True})
+        except GymMembership.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Membership not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def terms_and_conditions(request):
+    """Display terms and conditions"""
+    terms = get_object_or_404(TermsAndConditions, is_active=True)
+    return render(request, 'gym/terms_and_conditions.html', {'terms': terms})
+
+
+def send_confirmation_email(membership):
+    """Send confirmation email to member"""
+    subject = 'Gym Membership Enrollment Confirmation'
+    message = f"""
+    Dear {membership.full_name},
+    
+    Thank you for enrolling at Strength Base Gym!
+    
+    Your enrollment details:
+    - Unique ID: {membership.unique_link}
+    - Plan: {membership.get_plan_chosen_display()}
+    - Email: {membership.email_id}
+    
+    You can view your membership details at: {settings.SITE_URL}{membership.get_absolute_url()}
+    
+    Welcome to Strength Base Gym!
+    
+    Best regards,
+    Strength Base Gym Team
+    """
+    
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [membership.email_id],
+        fail_silently=False,
+    )
+
+# entrollment status and all 
+
+@login_required(login_url='SignIn')
+def new_enrolment(request):
+    enrolment_data = GymMembership.objects.filter(is_member = False)
+    context = {
+        "enrolment_data": enrolment_data
+    }
+    return render(request,"new_entrolments.html",context)
+
+
+@login_required(login_url='SignIn')
+def convert_member_form_enrolment(request, pk):
+    enroll = get_object_or_404(GymMembership, id = pk)
+    member = enroll.convert_to_member()
+    enroll.save()
+  
+    return redirect("MembersSingleView", pk = member.id)
+
+
+def enrollment_form_existing_member(request, pk):
+    """Display the gym membership enrollment form for existing member"""
+    member = get_object_or_404(MemberData, id=pk)
+    
+    if request.method == 'POST':
+        form = GymMembershipForm(request.POST, request.FILES)
+        if form.is_valid():
+            membership = form.save(commit=False)
+            
+            # Set the latest terms version
+            latest_terms = TermsAndConditions.objects.filter(is_active=True).first()
+            if latest_terms:
+                membership.terms_version = latest_terms
+            
+            membership.member = member
+            membership.is_member = True
+            membership.save()
+            
+            # Send confirmation email (optional)
+            try:
+                send_confirmation_email(membership)
+            except:
+                pass  # Email sending is optional
+            
+            messages.success(request, f'Enrollment successful! Your unique ID is: {membership.unique_link}')
+            return redirect('enrollment_success', unique_link=membership.unique_link)
+    else:
+        # Pre-populate form with existing member data
+        initial_data = {
+            'full_name': f"{member.First_Name} {member.Last_Name or ''}".strip(),
+            'date_of_birth': member.Date_Of_Birth,
+            'gender': member.Gender.lower() if member.Gender else None,  # Convert to lowercase to match form choices
+            'mobile_number': member.Mobile_Number,
+            'email_id': member.Email,
+            'address': member.Address,
+            'medical_condition_details': member.Medical_History,
+        }
+        
+        # Calculate age if date of birth is available
+        if member.Date_Of_Birth:
+            from datetime import date
+            today = date.today()
+            age = today.year - member.Date_Of_Birth.year - ((today.month, today.day) < (member.Date_Of_Birth.month, member.Date_Of_Birth.day))
+            initial_data['age'] = age
+        
+        # Create form with initial data
+        form = GymMembershipForm(initial=initial_data)
+    
+    # Get latest terms and conditions
+    terms = TermsAndConditions.objects.filter(is_active=True).first()
+    
+    context = {
+        'form': form,
+        'terms': terms,
+        'member': member
+    }
+    return render(request, 'gym/enrollment_form.html', context)
