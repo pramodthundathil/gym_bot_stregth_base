@@ -325,7 +325,11 @@
                     </div>
                 </div>
 
-                <input type="hidden" name="date" value="{{ today }}">
+                <input type="hidden" name="date" id="date_field" >
+                <script>
+                    // Set today's date in the hidden field using JS
+                    document.getElementById('date_field').value = new Date().toISOString().slice(0, 10);
+                </script>
 
                 <div style="text-align: center; margin-top: 2rem;">
                     <button type="submit" class="btn btn-primary">
