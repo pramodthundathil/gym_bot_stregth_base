@@ -120,7 +120,7 @@
           <div class="card-body px-0 overflow-auto">
             <h4 class="card-title pl-4">Documents</h4>
             <div class="container">
-              <div class="content d-flex justify-center">
+              <div class="content d-flex gap-5" style="justify-content: space-evenly;">
           <div class="items">
 
               {% if enrollment_form != None %}
@@ -177,11 +177,13 @@
 
               {% endif %}
               </div>
-              <div class="items">
-                  <a href="{% url 'health_history_form' member.id %}" target="_blank">Health History Form</a>
+              <div class="items d-flex" style="gap: 1rem;">
 
                   {% if member.health_history %}
-                      <a href="{% url 'health_history_detail' member.id %}" class="btn btn-info btn-sm">View Health History</a>
+                      <a href="{% url 'health_history_detail' member.id %}" class="btn btn-warning btn-sm">View Health History</a>
+                  {% else %}
+                  <a href="{% url 'health_history_form' member.id %}" class="btn btn-warning btn-sm" target="_blank">Health History Form</a>
+
                   {% endif %}
               </div>
 

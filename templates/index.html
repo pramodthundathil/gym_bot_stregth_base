@@ -744,6 +744,20 @@
 
     })
   </script>
+<!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  {% if messages %}
+        <script>
+            {% for message in messages %}
+                Swal.fire({
+                    icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
+                    title: "{{ message|escapejs }}",
+                    showConfirmButton: true,
+                    timer: 3000
+                });
+            {% endfor %}
+        </script>
+    {% endif %}
   <!-- container-scroller -->
   <!-- plugins:js -->
   <!-- <script src="{%static 'assets/vendors/js/vendor.bundle.base.js' %}"></script> -->
