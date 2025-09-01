@@ -82,7 +82,17 @@ urlpatterns = [
     path('membership/admin/<str:unique_link>/', views.membership_detail_admin, name='membership_detail_admin'),
     path('save-signature/', views.save_signature, name='save_signature'),
     path('terms/', views.terms_and_conditions, name='terms_and_conditions'),
-    
+    path('members/', views.member_list_view, name='member_list'),
+
+
+
+    # heath history 
+    path('health-history/<int:member_id>/form/', views.health_history_form_view, name='health_history_form'),
+    path('health-history/<int:member_id>/detail/', views.health_history_detail_view, name='health_history_detail'),
+    path('health-history/<int:member_id>/delete/', views.delete_health_history, name='delete_health_history'),
+    path('health-history/summary/', views.health_history_summary_view, name='health_history_summary'),
+    path("success_on_health_history/",views.success_on_health_history,name="success_on_health_history")
+
 
     
 ]

@@ -1832,3 +1832,131 @@ def enrollment_form_existing_member(request, pk):
         'member': member
     }
     return render(request, 'gym/enrollment_form.html', context)
+
+
+
+
+# helath history 
+
+
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+from .models import MemberData, HealthHistory, Medication
+from .forms import HealthHistoryForm, MedicationFormSet
+
+
+def health_history_form_view(request, member_id):
+    """View to create or edit health history for a member"""
+    member = get_object_or_404(MemberData, id=member_id)
+    
+    try:
+        health_history = member.health_history
+        is_new = False
+    except HealthHistory.DoesNotExist:
+        health_history = None
+        is_new = True
+    
+    if request.method == 'POST':
+        form = HealthHistoryForm(request.POST, instance=health_history)
+        medication_formset = MedicationFormSet(request.POST, instance=health_history)
+        
+        if form.is_valid() and medication_formset.is_valid():
+            health_history = form.save(commit=False)
+            health_history.member = member
+            health_history.save()
+            
+            medication_formset.instance = health_history
+            medication_formset.save()
+            
+            messages.success(request, f'Health history {"created" if is_new else "updated"} successfully for {member.First_Name}!')
+            return redirect('success_on_health_history')
+        else:
+            messages.error(request, f'Please correct the errors below.{form.errors}, {medication_formset.errors}')
+    else:
+        form = HealthHistoryForm(instance=health_history)
+        medication_formset = MedicationFormSet(instance=health_history)
+    
+    context = {
+        'form': form,
+        'medication_formset': medication_formset,
+        'member': member,
+        'is_new': is_new,
+    }
+    return render(request, 'health_history/form.html', context)
+
+def success_on_health_history(request):
+    return render(request,"health_history/success.html")
+
+
+@login_required
+def health_history_detail_view(request, member_id):
+    """View to display health history details for a member"""
+    member = get_object_or_404(MemberData, id=member_id)
+    
+    try:
+        health_history = member.health_history
+    except HealthHistory.DoesNotExist:
+        messages.info(request, f'No health history found for {member.First_Name}. Please complete the health questionnaire.')
+        return redirect('health_history_form', member_id=member.id)
+    
+    medications = health_history.medications.all()
+    
+    context = {
+        'member': member,
+        'health_history': health_history,
+        'medications': medications,
+    }
+    return render(request, 'health_history/detail.html', context)
+
+@login_required
+def member_list_view(request):
+    """View to list all members with their health history status"""
+    members = MemberData.objects.filter(Active_status=True).order_by('First_Name')
+    
+    member_data = []
+    for member in members:
+        try:
+            health_history = member.health_history
+            has_health_history = True
+            last_updated = health_history.last_updated
+        except HealthHistory.DoesNotExist:
+            has_health_history = False
+            last_updated = None
+        
+        member_data.append({
+            'member': member,
+            'has_health_history': has_health_history,
+            'last_updated': last_updated,
+        })
+    
+    context = {
+        'member_data': member_data,
+    }
+    return render(request, 'health_history/member_list.html', context)
+
+@require_http_methods(["DELETE"])
+@login_required
+def delete_health_history(request, member_id):
+    """AJAX view to delete health history"""
+    member = get_object_or_404(MemberData, id=member_id)
+    
+    try:
+        health_history = member.health_history
+        health_history.delete()
+        return JsonResponse({'success': True, 'message': 'Health history deleted successfully.'})
+    except HealthHistory.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'No health history found.'})
+
+@login_required
+def health_history_summary_view(request):
+    """View to show summary of all health histories"""
+    health_histories = HealthHistory.objects.select_related('member').order_by('-last_updated')
+    
+    context = {
+        'health_histories': health_histories,
+    }
+    return render(request, 'health_history/summary.html', context)

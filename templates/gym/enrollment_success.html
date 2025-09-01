@@ -1,9 +1,12 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enrollment Successful - Strength Base Gym</title>
+  <link rel="shortcut icon" href="{%static 'assets/images/Logo_Reveal_Slides.png' %}" />
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -166,9 +169,10 @@
             </div>
             
             <div class="gym-header">
-                <h1><i class="fas fa-dumbbell"></i> Strength Base Gym</h1>
+                <img src="{% static 'assets/images/Logo_Reveal_Slides.png' %}" alt="Strength Base Fitness Logo" style="width: 100px;"/>
+                <!-- <h1> Strength Base Fitness</h1> -->
                 <h2 class="text-success">Enrollment Successful!</h2>
-                <p class="lead">Welcome to the Strength Base Gym family!</p>
+                <p class="lead">Welcome to the Strength Base Fitness family!</p>
             </div>
             
             <div class="membership-card">
@@ -239,9 +243,9 @@
             </div>
             
             <div class="action-buttons">
-                <a href="{% url 'membership_detail' membership.unique_link %}" class="btn btn-primary">
+                <!-- <a href="{% url 'membership_detail' membership.unique_link %}" class="btn btn-primary">
                     <i class="fas fa-eye"></i> View Full Details
-                </a>
+                </a> -->
                 <a href="javascript:window.print()" class="btn btn-outline-primary">
                     <i class="fas fa-print"></i> Print This Page
                 </a>
@@ -257,7 +261,7 @@
                         <li>Please bring a valid ID proof for verification</li>
                         <li>Membership activation requires completed payment</li>
                         <li>All fees are non-refundable as per our terms and conditions</li>
-                        <li>Contact us at <strong>[Your Phone Number]</strong> for any queries</li>
+                        <li>Contact us at <strong>+91 89214 07268</strong> for any queries</li>
                     </ul>
                 </div>
             </div>
@@ -265,9 +269,9 @@
             <div class="mt-3">
                 <h6>Contact Information</h6>
                 <p>
-                    <i class="fas fa-phone"></i> +91 [Your Phone Number]<br>
+                    <i class="fas fa-phone"></i> +9 89214 07268<br>
                     <i class="fas fa-envelope"></i> info@strengthbasegym.com<br>
-                    <i class="fas fa-map-marker-alt"></i> [Your Gym Address]
+                    <i class="fas fa-map-marker-alt"></i> Strength Base Fitness
                 </p>
             </div>
         </div>
