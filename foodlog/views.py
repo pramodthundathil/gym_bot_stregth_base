@@ -421,10 +421,10 @@ from .models import DailyLog, MealEntry, WeightGoal, MemberData
 from django.contrib.auth.models import User
 
 def is_admin(user):
-    return user.is_staff or user.is_superuser
+    return user.is_staff or user.is_superuser 
 
 @login_required
-@user_passes_test(is_admin)
+#@user_passes_test(is_admin)
 def admin_monitoring_dashboard(request):
     """Main admin dashboard for monitoring member food logs and weight"""
     
@@ -464,7 +464,7 @@ def admin_monitoring_dashboard(request):
     return render(request, 'food_log/admin_monitoring_dashboard.html', context)
 
 @login_required
-@user_passes_test(is_admin)
+#@user_passes_test(is_admin)
 def admin_daily_logs_review(request):
     """Detailed review of daily logs with filtering options"""
     
@@ -535,7 +535,7 @@ def admin_daily_logs_review(request):
     return render(request, 'food_log/admin_daily_logs_review.html', context)
 
 @login_required
-@user_passes_test(is_admin)
+#@user_passes_test(is_admin)
 def admin_member_list(request):
     """List of all members with their logging activity"""
     
@@ -578,7 +578,7 @@ def admin_member_list(request):
     return render(request, 'food_log/admin_member_list.html', context)
 
 @login_required
-@user_passes_test(is_admin)
+#@user_passes_test(is_admin)
 def add_meal_comment(request):
     """Add admin comment to a meal entry"""
     
@@ -604,7 +604,7 @@ def add_meal_comment(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method!'})
 
 @login_required
-@user_passes_test(is_admin)
+#@user_passes_test(is_admin)
 def member_detail_logs(request, member_id):
     """Detailed view of a specific member's logs"""
     

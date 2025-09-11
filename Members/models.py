@@ -1,7 +1,53 @@
 from django.db import models
+from django.contrib.auth.models import User
+import random
+from .middleware import get_current_user
 
 
-# Setting classess 
+class MemberDataQuerySet(models.QuerySet):
+    def filter_by_trainer_if_needed(self):
+        """Apply trainer filter if current user is a trainer"""
+        current_user = get_current_user()
+        if current_user and current_user.is_authenticated:
+            if current_user.groups.filter(name='trainer').exists():
+                return self.filter(trainer=current_user)
+        return self
+
+class MemberDataManager(models.Manager):
+    def get_queryset(self):
+        """Override default queryset to automatically filter by trainer"""
+        return MemberDataQuerySet(self.model, using=self._db).filter_by_trainer_if_needed()
+    
+    def all_members(self):
+        """Method to get all members without trainer filtering (for admin use)"""
+        return super().get_queryset()
+    
+    def for_admin(self):
+        """Explicit method for admin to bypass trainer filtering"""
+        return super().get_queryset()
+
+class SubscriptionQuerySet(models.QuerySet):
+    def filter_by_trainer_if_needed(self):
+        """Apply trainer filter if current user is a trainer"""
+        current_user = get_current_user()
+        if current_user and current_user.is_authenticated:
+            if current_user.groups.filter(name='trainer').exists():
+                # Filter subscriptions by members assigned to this trainer
+                return self.filter(Member__trainer=current_user)
+        return self
+
+class SubscriptionManager(models.Manager):
+    def get_queryset(self):
+        """Override default queryset to automatically filter by trainer"""
+        return SubscriptionQuerySet(self.model, using=self._db).filter_by_trainer_if_needed()
+    
+    def all_subscriptions(self):
+        """Method to get all subscriptions without trainer filtering (for admin use)"""
+        return super().get_queryset()
+    
+    def for_admin(self):
+        """Explicit method for admin to bypass trainer filtering"""
+        return super().get_queryset()
 
 class Batch_DB(models.Model):
     Batch_Name = models.CharField(max_length=255,choices=(("Morning","Morning"),("Evening","Evening"),("Stoped","Stoped")))
@@ -46,7 +92,10 @@ class MemberData(models.Model):
     Access_status = models.BooleanField(default=False)
     Access_Token_Id = models.CharField(max_length=255,null=True,blank=True)
 
-    
+    trainer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+        # Use the custom manager
+    objects = MemberDataManager()
 
     def save(self, *args, **kwargs):
         if not self.Access_Token_Id:
@@ -90,7 +139,10 @@ class Subscription(models.Model):
     Payment_Status = models.BooleanField(default=False)
     partial_payment = models.BooleanField(default=False)
 
+    # Use the custom manager
+    objects = SubscriptionManager()
 
+    
     def __str__(self):
         return str(self.Type_Of_Subscription) + " " + str(self.Period_Of_Subscription)
     
@@ -571,6 +623,9 @@ class HealthHistory(models.Model):
     
     works_over_40_hours = models.BooleanField(default=False)
     additional_comments = models.TextField(max_length=2000, null=True, blank=True)
+
+
+    
     
     # Form completion
     date_completed = models.DateTimeField(auto_now_add=True)

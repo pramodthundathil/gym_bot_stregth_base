@@ -67,6 +67,21 @@
               <input type="file" name="photo" required class="text-black mt-3 d-block font-weight-medium h6">
               <button type="submit" class="btn btn-info">Upload New Photo</button>
             </form>
+
+            <div class="container mt-3 p-3" style="border: .5px solid rgb(0, 21, 255);">
+              <form action="{%url 'AssignTrainerToMember' member.id %}" method="post">
+                {% csrf_token %}
+                <label for="trainerSelect" class="form-label mt-3">Assign Trainer:</label>
+                <select class="form-control" id="trainerSelect" name="trainer" {% if request.user.groups.all.0.name == "trainer" %}disabled{% endif %}>
+                  <option value="" {% if not member.trainer %}selected{% endif %}>No Trainer Assigned</option>
+                  {% for trainer in trainers %}
+                  <option value="{{ trainer.id }}" {% if member.trainer and member.trainer.id == trainer.id %}selected{% endif %}>{{ trainer.first_name }} ({{ trainer.username }})</option>
+                  {% endfor %}
+                </select>
+                <br>
+                <button type="submit" class="btn btn-info mt-3">Assign Trainer</button>
+              </form>
+            </div>
           </div>
         </div>
       </div>

@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Index.apps.IndexConfig',
+    'Index',
     'Members.apps.MembersConfig',
     'Finance.apps.FinanceConfig',
     'enquiry',
@@ -60,6 +60,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'Members.middleware.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -91,6 +92,7 @@ MESSAGE_TAGS = {
  }
 
 WSGI_APPLICATION = 'gym_bot.wsgi.application'
+
 
 
 # Database

@@ -20,16 +20,16 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
-    <style>
-      #photoclient:hover{
-        transform: scale(8);
-        transition: transform 0.5s;
-        z-index: 1055;
-        position: absolute;
+  <style>
+    #photoclient:hover {
+      transform: scale(8);
+      transition: transform 0.5s;
+      z-index: 1055;
+      position: absolute;
 
 
-      } 
-    </style>
+    }
+  </style>
 </head>
 
 <body>
@@ -37,14 +37,15 @@
     <nav class="sidebar sidebar-offcanvas" id="sidebar">
       <div class="text-center sidebar-brand-wrapper d-flex align-items-center bg-dark">
         <a class="sidebar-brand brand-logo" href="{%url 'Home' %}"><img
-            src="{%static 'assets/images/Logo_Reveal_Slides.png' %}" alt="logo" style="object-fit: contain; margin-top: -30px;" /></a>
+            src="{%static 'assets/images/Logo_Reveal_Slides.png' %}" alt="logo"
+            style="object-fit: contain; margin-top: -30px;" /></a>
         <a class="sidebar-brand brand-logo-mini pl-4 pt-3" href="{%url 'Home' %}"><img
             src="{%static 'assets/images/Logo_Reveal_Slides.png' %}" alt="logo" /></a>
       </div>
       <ul class="nav">
         <li class="nav-item nav-profile">
           <a href="#" class="nav-link">
-            <div class="nav-profile-image" >
+            <div class="nav-profile-image">
               <img src="{%static 'assets/images/faces/face1.jpg' %}" alt="profile" />
               <span class="login-status online"></span>
               <!--change to offline or busy as needed-->
@@ -62,6 +63,14 @@
             <span class="menu-title">Dashboard</span>
           </a>
         </li>
+        {% if request.user.groups.all.0.name == "trainer" %}
+        <li class="nav-item">
+          <a class="nav-link" href="{%url 'admin_monitoring_dashboard'%}">
+            <i class="mdi mdi-food-fork-drink menu-icon"></i>
+            <span class="menu-title">Member Food Logging</span>
+          </a>
+        </li>
+        {% else %}
         <li class="nav-item">
           <a class="nav-link" href="{%url 'new_enrolment' %}">
             <i class="mdi menu-icon  mdi-account-star"></i>
@@ -100,14 +109,14 @@
           </a>
         </li>
 
-<!--         
+        <!--         
         <li class="nav-item">
           <a class="nav-link" href="{%url 'admin_monitoring_dashboard'%}">
             <i class="mdi mdi-cash-multiple menu-icon"></i>
             <span class="menu-title">Member Food Logging</span>
           </a>
         </li> -->
-        
+
         <li class="nav-item">
           <a class="nav-link" href="{%url 'income' %}">
             <i class="mdi mdi-cash-multiple menu-icon"></i>
@@ -174,6 +183,7 @@
             <span class="menu-title">Support</span>
           </a>
         </li>
+        {% endif %}
         <!-- <li class="nav-item">
             <a class="nav-link" href="https://www.bootstrapdash.com/demo/breeze-free/documentation/documentation.html">
               <i class="mdi mdi-file-document-box menu-icon"></i>
@@ -232,9 +242,9 @@
                 <a class="dropdown-item preview-item">
                   <div class="preview-thumbnail">
                     {% if i.Member.Photo %}
-                    <img src="{{i.Member.Photo.url}}" alt="image"  id="photoclient"/>
+                    <img src="{{i.Member.Photo.url}}" alt="image" id="photoclient" />
                     {% else %}
-                    <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" id="photoclient"/>
+                    <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" id="photoclient" />
                     {% endif %}
                   </div>
                   <div class="preview-item-content">
@@ -372,7 +382,7 @@
                     </div>
                   </div>
                 </div>
-                                <!-- Your existing total members card -->
+                <!-- Your existing total members card -->
                 <!-- <div class="col-xl-3 col-lg-12 stretch-card grid-margin">
                   <div class="card bg-info">
                       <div class="card-body px-3 py-4">
@@ -449,9 +459,9 @@
                           <td>
                             <div class="d-flex align-items-center">
                               {% if sub.Member.Photo %}
-                              <img src="{{sub.Member.Photo.url}}" alt="image"  id="photoclient"/>
+                              <img src="{{sub.Member.Photo.url}}" alt="image" id="photoclient" />
                               {% else %}
-                              <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" id="photoclient"/>
+                              <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" id="photoclient" />
                               {% endif %}
                               <div class="table-user-name ml-3">
                                 <p class="mb-0 font-weight-medium"> {{sub.Member.First_Name}} {{sub.Member.Last_Name}}
@@ -459,14 +469,14 @@
                                 {% if sub.Payment_Status == False %}
                                 <small class="text-danger"> Payment Not Completed</small>
                                 {% else %}
-                                  
-                                  {% if sub.Subscription_payment.all.last.Payment_Balance > 0 %}
-                                  <small class="text-warning"> Payment Partially Done</small>
+
+                                {% if sub.Subscription_payment.all.last.Payment_Balance > 0 %}
+                                <small class="text-warning"> Payment Partially Done</small>
 
 
-                                  {% else %}
-                                  <small> Payment done</small>
-                                  {% endif %}
+                                {% else %}
+                                <small> Payment done</small>
+                                {% endif %}
 
                                 {% endif %}
                               </div>
@@ -519,9 +529,9 @@
                           <td>
                             <div class="d-flex align-items-center">
                               {% if sub.Member.Photo %}
-                              <img src="{{sub.Member.Photo.url}}" alt="image"  id="photoclient"/>
+                              <img src="{{sub.Member.Photo.url}}" alt="image" id="photoclient" />
                               {% else %}
-                              <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" id="photoclient"/>
+                              <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" id="photoclient" />
                               {% endif %}
                               <div class="table-user-name ml-3">
                                 <p class="mb-0 font-weight-medium"> {{sub.Member.First_Name}} {{sub.Member.Last_Name}}
@@ -529,14 +539,14 @@
                                 {% if sub.Payment_Status == False %}
                                 <small class="text-danger"> Payment Not Completed</small>
                                 {% else %}
-                                  
-                                  {% if sub.Subscription_payment.all.last.Payment_Balance > 0 %}
-                                  <small class="text-warning"> Payment Partially Done</small>
+
+                                {% if sub.Subscription_payment.all.last.Payment_Balance > 0 %}
+                                <small class="text-warning"> Payment Partially Done</small>
 
 
-                                  {% else %}
-                                  <small> Payment done</small>
-                                  {% endif %}
+                                {% else %}
+                                <small> Payment done</small>
+                                {% endif %}
 
                                 {% endif %}
                               </div>
@@ -646,7 +656,8 @@
 
         <footer class="footer">
           <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Byteboot Techno Solutions Pvt Ltd</span>
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Byteboot Techno
+              Solutions Pvt Ltd</span>
             <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Developed By <a
                 href="https://www.byteboot.in/" target="_blank">Byteboot Techno Solutions Pvt Ltd</a></span>
           </div>
@@ -744,20 +755,20 @@
 
     })
   </script>
-<!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   {% if messages %}
-        <script>
-            {% for message in messages %}
-                Swal.fire({
-                    icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
-                    title: "{{ message|escapejs }}",
-                    showConfirmButton: true,
-                    timer: 3000
-                });
-            {% endfor %}
-        </script>
-    {% endif %}
+  <script>
+    {% for message in messages %}
+    Swal.fire({
+      icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
+      title: "{{ message|escapejs }}",
+      showConfirmButton: true,
+      timer: 3000
+    });
+    {% endfor %}
+  </script>
+  {% endif %}
   <!-- container-scroller -->
   <!-- plugins:js -->
   <!-- <script src="{%static 'assets/vendors/js/vendor.bundle.base.js' %}"></script> -->

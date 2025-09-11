@@ -15,6 +15,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from Index.models import Logo
 from Index.decorator import allowed_users
+from django.contrib.auth.models import User
 
 
 
@@ -214,6 +215,7 @@ def Member(request):
 @login_required(login_url='SignIn')
 def MembersSingleView(request,pk):
     member = MemberData.objects.get(id = pk)
+    trainers = User.objects.filter(groups__name = 'trainer')
     try:
         subscription = Subscription.objects.get(Member = member)
     except:
@@ -237,10 +239,28 @@ def MembersSingleView(request,pk):
         "access":access,
         "notification_payments":notification_payments,
         "payments":payments,
-        "enrollment_form":enrollment_form
+        "enrollment_form":enrollment_form,
+        'trainers':trainers
 
     }
     return render(request,"memberssingleview.html",context)
+
+
+
+
+@login_required(login_url='SignIn')
+def AssignTrainerToMember(request, pk):
+    member = get_object_or_404(MemberData, id = pk)
+    if request.method == "POST":
+        trainer_id = request.POST['trainer']
+        member.trainer = get_object_or_404(User, id = int(trainer_id))
+        member.save()
+        messages.success(request," Trainer Assigned")
+        return redirect("MembersSingleView",pk)
+    else:
+        return redirect("MembersSingleView",pk)
+
+        
 
 @login_required(login_url='SignIn')
 def UpdateMember(request,pk):

@@ -337,12 +337,13 @@ def EditSub(request,pk):
 @allowed_users(allowed_roles=["admin",])
 @login_required(login_url='SignIn')
 def StaffDetails(request):
-    users = User.objects.filter(groups__name='staff')
+    users = User.objects.filter(groups__name__in=['staff', 'trainer']).distinct()
     if request.method == "POST":
         fname = request.POST['fname']
         uname = request.POST['uname']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
+        role = request.POST['role']
 
         if password1 != password2:
             messages.error(request,"Password Do not matching....")
@@ -353,8 +354,12 @@ def StaffDetails(request):
         else:
             user = User.objects.create_user(first_name = fname, username = uname, password = password1)
             user.save()
-            group = Group.objects.get(name='staff')
-            user.groups.add(group)
+            if role == 'trainer':
+                group = Group.objects.get(name='trainer')
+                user.groups.add(group)
+            else:
+                group = Group.objects.get(name='staff')
+                user.groups.add(group)
             messages.success(request,"New Staff Created Please save password {}".format(password1))
             return redirect("StaffDetails")
     context = {
