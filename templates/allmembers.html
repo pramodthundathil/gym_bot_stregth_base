@@ -39,7 +39,7 @@
                 </thead>
                 <tbody>
                   {% for sub in member %}
-                  <tr>
+                  <tr class="{% if sub.risk_medical == True %}table-danger{% endif %}">
                     <th>{{forloop.counter}}</th>
                     <td>
                       <div class="d-flex align-items-center">

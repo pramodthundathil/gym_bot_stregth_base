@@ -31,10 +31,28 @@
 
     <div class="row">
       <div class="col-xl-6 col-sm-6 grid-margin stretch-card" style="height: auto !important;">
-        <div class="card" style="height: 500px;">
+        <div class="card" >
           <div class="card-body">
+             
             <div class="card-title font-weight-medium"> {{member.First_Name}} {% if member.Last_Name != None %} {{member.Last_Name}} {% endif %} - id Number: {{member.id}} </div>
             <p class="text-muted"> Member Since: <span class="badge badge-info">{{member.Registration_Date}}</span> </p>
+            {% if member.risk_medical == True %}
+            <div class="bg-danger text-white p-4 mt-2 mb-2">High Risk member</div>
+{% endif %}
+            <div class="container mt-3 mb-3 p-3" style="border: .5px solid rgb(0, 21, 255);">
+              <form action="{%url 'AssignTrainerToMember' member.id %}" method="post">
+                {% csrf_token %}
+                <label for="trainerSelect" class="form-label mt-3">Assign Trainer:</label>
+                <select class="form-control" id="trainerSelect" name="trainer" {% if request.user.groups.all.0.name == "trainer" %}disabled{% endif %}>
+                  <option value="" {% if not member.trainer %}selected{% endif %}>No Trainer Assigned</option>
+                  {% for trainer in trainers %}
+                  <option value="{{ trainer.id }}" {% if member.trainer and member.trainer.id == trainer.id %}selected{% endif %}>{{ trainer.first_name }} ({{ trainer.username }})</option>
+                  {% endfor %}
+                </select>
+                <br>
+                <button type="submit" class="btn btn-info mt-3">Assign Trainer</button>
+              </form>
+            </div>
             <div class="d-flex flex-wrap border-bottom py-2 border-top justify-content-between">
               {% if member.Photo %}
               <img class="survey-img mb-lg-3" src="{{member.Photo.url}}" alt=""
@@ -68,20 +86,7 @@
               <button type="submit" class="btn btn-info">Upload New Photo</button>
             </form>
 
-            <div class="container mt-3 p-3" style="border: .5px solid rgb(0, 21, 255);">
-              <form action="{%url 'AssignTrainerToMember' member.id %}" method="post">
-                {% csrf_token %}
-                <label for="trainerSelect" class="form-label mt-3">Assign Trainer:</label>
-                <select class="form-control" id="trainerSelect" name="trainer" {% if request.user.groups.all.0.name == "trainer" %}disabled{% endif %}>
-                  <option value="" {% if not member.trainer %}selected{% endif %}>No Trainer Assigned</option>
-                  {% for trainer in trainers %}
-                  <option value="{{ trainer.id }}" {% if member.trainer and member.trainer.id == trainer.id %}selected{% endif %}>{{ trainer.first_name }} ({{ trainer.username }})</option>
-                  {% endfor %}
-                </select>
-                <br>
-                <button type="submit" class="btn btn-info mt-3">Assign Trainer</button>
-              </form>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -141,7 +146,9 @@
               {% if enrollment_form != None %}
               <a href="{% url 'membership_detail_admin' enrollment_form.unique_link %}" class="btn btn-outline-info">Enrolment Details</a>
               {% else %}
-          
+
+              
+   
           <button data-bs-toggle="modal" data-bs-target="#shareFormModal" class="btn btn-primary btn-icon-text border ml-3">
            <i class="mdi mdi-share-variant"></i> Fill Enrollment Form </button>
 
@@ -200,6 +207,13 @@
                   <a href="{% url 'health_history_form' member.id %}" class="btn btn-warning btn-sm" target="_blank">Health History Form</a>
 
                   {% endif %}
+              </div>
+              <div class="items">
+                {% if parque != None %}
+                  <a href="{% url 'parq_detail' parque.id %}">View Par-Q Detail Form</a>
+              {% else %}
+                 <a href="{% url 'parq_create' member.id %}" class="btn btn-danger">Fill Par-Q</a>
+              {% endif %}
               </div>
 
               </div>

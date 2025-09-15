@@ -665,7 +665,25 @@ class HealthHistoryForm(forms.ModelForm):
                 'rows': 4,
                 'placeholder': 'Any additional comments pertinent to your exercise program...'
             }),
+
+            'has_risky_heart_conditions': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'risky_heart_conditions_details': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Please explain specific heart/cardiovascular conditions (e.g., heart disease, uncontrolled high blood pressure, irregular heartbeat, history of heart attack/stroke)...'
+            }),
+            'has_risky_health_conditions': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'risky_health_conditions_details': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Please explain other health conditions that may be risky for gym workouts (respiratory issues, joint problems, metabolic conditions, neurological disorders, etc.)...'
+            }),
         }
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -709,3 +727,164 @@ MedicationFormSet = inlineformset_factory(
     extra=3,  # Show 3 empty forms initially
     can_delete=True
 )
+
+
+
+#ParQ
+from .models import ParqForm, MemberData
+
+class ParqFormModelForm(forms.ModelForm):
+    class Meta:
+        model = ParqForm
+        fields = [
+            
+            'emergency_contact_name',
+            'emergency_contact_phone',
+            'emergency_contact_mobile',
+            'heart_condition',
+            'chest_pain_activity',
+            'chest_pain_last_month',
+            'lose_consciousness',
+            'bone_joint_problem',
+            'medical_conditions',
+            'medical_conditions_specify',
+            'current_treatment',
+            'current_treatment_specify',
+            'other_reason',
+            'other_reason_specify',
+            'participant_signature',
+            'parent_guardian_signature',
+            'tutor_signature',
+            'participant_signature_date',
+            'parent_guardian_signature_date',
+            'tutor_signature_date'
+        ]
+        
+        widgets = {
+            'member': forms.Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Select Member'
+            }),
+            'emergency_contact_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Emergency Contact Name'
+            }),
+            'emergency_contact_phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Emergency Contact Phone'
+            }),
+            'emergency_contact_mobile': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Emergency Contact Mobile'
+            }),
+            'medical_conditions_specify': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Please specify medical conditions'
+            }),
+            'current_treatment_specify': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Please specify current treatment'
+            }),
+            'other_reason_specify': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Please specify other reasons'
+            }),
+            'participant_signature': forms.HiddenInput(),
+            'parent_guardian_signature': forms.HiddenInput(),
+            'tutor_signature': forms.HiddenInput(),
+            'participant_signature_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'parent_guardian_signature_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'tutor_signature_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Add Bootstrap classes to boolean fields
+        boolean_fields = [
+            'heart_condition', 'chest_pain_activity', 'chest_pain_last_month',
+            'lose_consciousness', 'bone_joint_problem', 'medical_conditions',
+            'current_treatment', 'other_reason'
+        ]
+        
+        for field_name in boolean_fields:
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-check-input'
+            })
+
+class ParqUpdateForm(forms.ModelForm):
+    class Meta:
+        model = ParqForm
+        fields = [
+            'emergency_contact_name',
+            'emergency_contact_phone', 
+            'emergency_contact_mobile',
+            'heart_condition',
+            'chest_pain_activity',
+            'chest_pain_last_month',
+            'lose_consciousness',
+            'bone_joint_problem',
+            'medical_conditions',
+            'medical_conditions_specify',
+            'current_treatment',
+            'current_treatment_specify',
+            'other_reason',
+            'other_reason_specify'
+        ]
+        
+        widgets = {
+            'emergency_contact_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Emergency Contact Name'
+            }),
+            'emergency_contact_phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Emergency Contact Phone'
+            }),
+            'emergency_contact_mobile': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Emergency Contact Mobile'
+            }),
+            'medical_conditions_specify': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Please specify medical conditions'
+            }),
+            'current_treatment_specify': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Please specify current treatment'
+            }),
+            'other_reason_specify': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Please specify other reasons'
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Add Bootstrap classes to boolean fields
+        boolean_fields = [
+            'heart_condition', 'chest_pain_activity', 'chest_pain_last_month',
+            'lose_consciousness', 'bone_joint_problem', 'medical_conditions',
+            'current_treatment', 'other_reason'
+        ]
+        
+        for field_name in boolean_fields:
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-check-input'
+            })

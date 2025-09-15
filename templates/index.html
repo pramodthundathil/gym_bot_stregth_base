@@ -320,7 +320,7 @@
                 <span class="visually-hidden"></span>
               </div> <span class="text-success">Checking Unpaid members....</span>
             </div>
-
+            {% if request.user.groups.all.0.name != "trainer" %}
             <div class="d-flex">
               <a href="{%url 'AllMembers' %}" type="button" class="btn btn-sm bg-white btn-icon-text border">
                 <i class="mdi mdi-account-multiple btn-icon-prepend"></i> All Members </a>
@@ -330,6 +330,12 @@
               <a href="{%url 'FeePendingMembers' %}" type="button" class="btn btn-sm ml-3 btn-success">
                 <i class="mdi mdi-alert-circle-outline btn-icon-prepend"></i> Fee Pending Members </a>
             </div>
+            {% else %}
+             <div class="d-flex">
+              <a href="{%url 'AllMembers' %}" type="button" class="btn btn-sm bg-white btn-icon-text border">
+                <i class="mdi mdi-account-multiple btn-icon-prepend"></i> All Members </a>
+                </div>
+            {% endif %}
 
           </div>
           <div class="row">
@@ -403,6 +409,7 @@
 
               </div>
             </div>
+            {% if request.user.groups.all.0.name != "trainer" %}
             <div class="col-md-12">
               <div class="row">
                 <div class="col-xl-6 col-md-6 stretch-card grid-margin grid-margin-sm-0 pb-sm-3">
@@ -438,6 +445,7 @@
                 </div>
               </div>
             </div>
+            {% endif %}
             <div class="col-xl-6 col-sm-6 grid-margin stretch-card">
               <div class="card" style="max-height: 700px;">
                 <div class="card-body px-0 overflow-auto">
@@ -455,8 +463,8 @@
                       </thead>
                       <tbody>
                         {% for sub in subscribers %}
-                        <tr>
-                          <td>
+                        <tr class="{% if sub.Member.risk_medical == True %}table-danger{% endif %}">
+                          <td >
                             <div class="d-flex align-items-center">
                               {% if sub.Member.Photo %}
                               <img src="{{sub.Member.Photo.url}}" alt="image" id="photoclient" />
@@ -525,7 +533,7 @@
                       </thead>
                       <tbody>
                         {% for sub in subscribers_pending %}
-                        <tr>
+                        <tr class="{% if sub.Member.risk_medical == True %}table-danger{% endif %}">
                           <td>
                             <div class="d-flex align-items-center">
                               {% if sub.Member.Photo %}

@@ -226,6 +226,90 @@
       </div>
     </div>
 
+    <!-- Health Conditions Risky for Gym Workouts -->
+{% if health_history.has_risky_heart_conditions or health_history.has_risky_health_conditions %}
+<div class="row">
+  <div class="col-12">
+    <div class="card border-warning">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0">
+          <i class="mdi mdi-alert-octagon text-danger me-2"></i>
+          ⚠️ Health Conditions Risky for Gym Workouts
+        </h5>
+        <small class="text-dark">These conditions require special attention and monitoring during exercise</small>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Heart/Cardiovascular Conditions -->
+          {% if health_history.has_risky_heart_conditions %}
+          <div class="col-lg-6 mb-3">
+            <div class="alert alert-danger border-left-danger">
+              <div class="d-flex align-items-start">
+                <i class="mdi mdi-heart-pulse text-danger me-3" style="font-size: 1.5rem; margin-top: 2px;"></i>
+                <div>
+                  <h6 class="alert-heading text-danger mb-2">
+                    <strong>Heart/Cardiovascular Risk Conditions</strong>
+                  </h6>
+                  <span class="badge badge-danger mb-2">REQUIRES MEDICAL CLEARANCE</span>
+                  {% if health_history.risky_heart_conditions_details %}
+                  <p class="mb-0">{{ health_history.risky_heart_conditions_details }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Other High-Risk Health Conditions -->
+          {% if health_history.has_risky_health_conditions %}
+          <div class="col-lg-6 mb-3">
+            <div class="alert alert-warning border-left-warning">
+              <div class="d-flex align-items-start">
+                <i class="mdi mdi-medical-bag text-warning me-3" style="font-size: 1.5rem; margin-top: 2px;"></i>
+                <div>
+                  <h6 class="alert-heading text-warning mb-2">
+                    <strong>Other High-Risk Health Conditions</strong>
+                  </h6>
+                  <span class="badge badge-warning mb-2">REQUIRES SPECIAL ATTENTION</span>
+                  {% if health_history.risky_health_conditions_details %}
+                  <p class="mb-0">{{ health_history.risky_health_conditions_details }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Safety Recommendations -->
+        <div class="row mt-3">
+          <div class="col-12">
+            <div class="alert alert-info border-left-info">
+              <h6 class="text-info mb-2">
+                <i class="mdi mdi-information me-2"></i>
+                Safety Recommendations
+              </h6>
+              <ul class="mb-0 text-muted">
+                {% if health_history.has_risky_heart_conditions %}
+                <li><strong>Medical Clearance Required:</strong> Consult physician before starting any exercise program</li>
+                <li><strong>Supervised Training:</strong> Initial sessions should be closely monitored by qualified trainers</li>
+                <li><strong>Emergency Preparedness:</strong> Staff should be aware of cardiac risk factors</li>
+                {% endif %}
+                {% if health_history.has_risky_health_conditions %}
+                <li><strong>Modified Exercise Plan:</strong> Workout intensity and types may need adjustment</li>
+                <li><strong>Regular Monitoring:</strong> Frequent check-ins during exercise sessions</li>
+                {% endif %}
+                <li><strong>Emergency Contact:</strong> Keep emergency contact readily available during all sessions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
     <!-- Health Conditions & Risk Factors -->
     <div class="row">
       <div class="col-12">

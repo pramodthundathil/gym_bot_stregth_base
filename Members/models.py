@@ -84,6 +84,9 @@ class MemberData(models.Model):
     Email = models.EmailField(null=True, blank=True)
     Address = models.TextField(max_length=200, null= True,blank=True )
     Medical_History = models.TextField(max_length=2000,null=True,blank=True)
+
+    risk_medical = models.BooleanField(default=False)
+    
     Registration_Date = models.DateField(auto_now_add=False)
     Photo = models.FileField(upload_to='member_photo', null= True,blank=True)
     Id_Upload = models.FileField(upload_to="member_id", null=True, blank=True)
@@ -625,7 +628,32 @@ class HealthHistory(models.Model):
     additional_comments = models.TextField(max_length=2000, null=True, blank=True)
 
 
+    # risky elements
+    # 
     
+    # Health Conditions Risky for Gym Workouts
+    has_risky_heart_conditions = models.BooleanField(
+        default=False, 
+        help_text="Heart disease, uncontrolled high blood pressure, irregular heartbeat, history of heart attack/stroke"
+    )
+    risky_heart_conditions_details = models.TextField(
+        max_length=1000, 
+        null=True, 
+        blank=True,
+        help_text="Explain specific heart/cardiovascular conditions"
+    )
+
+    has_risky_health_conditions = models.BooleanField(
+        default=False,
+        help_text="Respiratory issues, joint problems, metabolic conditions, neurological disorders, etc."
+    )
+    risky_health_conditions_details = models.TextField(
+        max_length=1000, 
+        null=True, 
+        blank=True,
+        help_text="Explain specific health conditions that may be risky for gym workouts"
+    ) 
+        
     
     # Form completion
     date_completed = models.DateTimeField(auto_now_add=True)
@@ -647,3 +675,67 @@ class Medication(models.Model):
     
     def __str__(self):
         return f"{self.medication_type} - {self.health_history.member.First_Name}"
+    
+
+
+
+
+class ParqForm(models.Model):
+    member = models.OneToOneField('MemberData', on_delete=models.CASCADE, related_name='health_history_parque')
+    
+    # Contact Details
+    emergency_contact_name = models.CharField(max_length=100, blank=True, null=True)
+    emergency_contact_phone = models.CharField(max_length=15, blank=True, null=True)
+    emergency_contact_mobile = models.CharField(max_length=15, blank=True, null=True)
+    
+    # PAR-Q Questions (YES/NO)
+    heart_condition = models.BooleanField(default=False, help_text="Has your doctor ever said that you have a heart condition?")
+    chest_pain_activity = models.BooleanField(default=False, help_text="Do you have chest pain brought on by physical activity?")
+    chest_pain_last_month = models.BooleanField(default=False, help_text="Have you developed chest pain in the last month?")
+    lose_consciousness = models.BooleanField(default=False, help_text="Do you tend to lose consciousness or fall over as a result of dizziness?")
+    bone_joint_problem = models.BooleanField(default=False, help_text="Do you have a bone or joint problem that could be aggravated by physical activity?")
+    medical_conditions = models.BooleanField(default=False, help_text="Do you suffer from asthma, diabetes, high blood pressure, epilepsy or a heart condition?")
+    medical_conditions_specify = models.TextField(blank=True, null=True, help_text="Please specify medical conditions")
+    current_treatment = models.BooleanField(default=False, help_text="Do you have any current conditions or injuries being treated by a doctor?")
+    current_treatment_specify = models.TextField(blank=True, null=True, help_text="Please specify current treatment")
+    other_reason = models.BooleanField(default=False, help_text="Do you know of any other reason why you should not take part in exercise?")
+    other_reason_specify = models.TextField(blank=True, null=True, help_text="Please specify other reasons")
+    
+    # Signatures
+    participant_signature = models.TextField(blank=True, null=True, help_text="Participant signature data (base64)")
+    parent_guardian_signature = models.TextField(blank=True, null=True, help_text="Parent/Guardian signature data (base64)")
+    tutor_signature = models.TextField(blank=True, null=True, help_text="Tutor signature data (base64)")
+    
+    # Dates
+    form_date = models.DateField(auto_now_add=True)
+    participant_signature_date = models.DateField(blank=True, null=True)
+    parent_guardian_signature_date = models.DateField(blank=True, null=True)
+    tutor_signature_date = models.DateField(blank=True, null=True)
+    
+    # Form status
+    requires_doctor_consent = models.BooleanField(default=False)
+    is_completed = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        # Check if doctor's consent is required (if any question is answered YES)
+        self.requires_doctor_consent = any([
+            self.heart_condition,
+            self.chest_pain_activity,
+            self.chest_pain_last_month,
+            self.lose_consciousness,
+            self.bone_joint_problem,
+            self.medical_conditions,
+            self.current_treatment,
+            self.other_reason
+        ])
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"PAR-Q Form - {self.member.First_Name}"
+    
+    class Meta:
+        verbose_name = "PAR-Q Form"
+        verbose_name_plural = "PAR-Q Forms"

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import MemberAddForm, SubscriptionAddForm, PaymentForm
-from .models import MemberData, Subscription, Payment, AccessToGate, Discounts
+from .models import MemberData, Subscription, Payment, AccessToGate, Discounts, ParqForm
 from django.contrib import messages
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -216,6 +216,11 @@ def Member(request):
 def MembersSingleView(request,pk):
     member = MemberData.objects.get(id = pk)
     trainers = User.objects.filter(groups__name = 'trainer')
+    parque = None
+    try:
+        parque = get_object_or_404(ParqForm, member = member)
+    except:
+        parque = None
     try:
         subscription = Subscription.objects.get(Member = member)
     except:
@@ -240,7 +245,8 @@ def MembersSingleView(request,pk):
         "notification_payments":notification_payments,
         "payments":payments,
         "enrollment_form":enrollment_form,
-        'trainers':trainers
+        'trainers':trainers,
+        "parque":parque
 
     }
     return render(request,"memberssingleview.html",context)
@@ -1888,12 +1894,22 @@ def health_history_form_view(request, member_id):
             health_history = form.save(commit=False)
             health_history.member = member
             health_history.save()
-            
+
+            if health_history.has_risky_heart_conditions or health_history.has_risky_health_conditions:
+                health_history.member.risk_medical = True
+                health_history.member.save()
+
             medication_formset.instance = health_history
             medication_formset.save()
+
             
-            messages.success(request, f'Health history {"created" if is_new else "updated"} successfully for {member.First_Name}!')
-            return redirect('success_on_health_history')
+            if health_history.has_risky_heart_conditions:
+                messages.success(request, f'Health history {"created" if is_new else "updated"} successfully for {member.First_Name}!, Please Fill Par-Q')
+                return redirect('parq_create', pk = health_history.member.id)
+            else:
+                messages.success(request, f'Health history {"created" if is_new else "updated"} successfully for {member.First_Name}!')
+                return redirect('success_on_health_history')
+            
         else:
             messages.error(request, f'Please correct the errors below.{form.errors}, {medication_formset.errors}')
     else:
@@ -1980,3 +1996,113 @@ def health_history_summary_view(request):
         'health_histories': health_histories,
     }
     return render(request, 'health_history/summary.html', context)
+
+
+
+#parque data
+
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.views.generic import CreateView, UpdateView, DetailView
+from django.urls import reverse_lazy
+from django.http import JsonResponse
+from .models import ParqForm, MemberData
+from .forms import ParqFormModelForm, ParqUpdateForm
+import base64
+from django.core.files.base import ContentFile
+
+def parq_form_create(request, pk):
+    """Create new PAR-Q form"""
+    member = get_object_or_404(MemberData, id = pk)
+    if request.method == 'POST':
+        form = ParqFormModelForm(request.POST)
+        if form.is_valid():
+            parq_form = form.save(commit=False)
+            
+            # Handle signature data
+            if request.POST.get('participant_signature_data'):
+                parq_form.participant_signature = request.POST.get('participant_signature_data')
+            if request.POST.get('parent_guardian_signature_data'):
+                parq_form.parent_guardian_signature = request.POST.get('parent_guardian_signature_data')
+            if request.POST.get('tutor_signature_data'):
+                parq_form.tutor_signature = request.POST.get('tutor_signature_data')
+            
+            parq_form.member = member
+            parq_form.is_completed = True
+            parq_form.save()
+            
+           
+            
+            messages.success(request, 'PAR-Q Form submitted successfully!')
+            return redirect('parq_detail', pk=parq_form.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ParqFormModelForm()
+    
+    context = {
+        'form': form,
+        'member':member,
+        'title': 'Physical Activity Readiness Questionnaire (PAR-Q)'
+    }
+    return render(request, 'parq/parq_form.html', context)
+
+def parq_form_update(request, pk):
+    """Update existing PAR-Q form"""
+    parq_form = get_object_or_404(ParqForm, pk=pk)
+    
+    if request.method == 'POST':
+        form = ParqUpdateForm(request.POST, instance=parq_form)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'PAR-Q Form updated successfully!')
+            return redirect('parq_detail', pk=parq_form.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ParqUpdateForm(instance=parq_form)
+    
+    context = {
+        'form': form,
+        'parq_form': parq_form,
+        'title': 'Update PAR-Q Form'
+    }
+    return render(request, 'parq/parq_update_form.html', context)
+
+def parq_form_detail(request, pk):
+    """View PAR-Q form details"""
+    parq_form = get_object_or_404(ParqForm, pk=pk)
+    
+    context = {
+        'parq_form': parq_form,
+        'title': 'PAR-Q Form Details'
+    }
+    return render(request, 'parq/parq_detail.html', context)
+
+def parq_form_list(request):
+    """List all PAR-Q forms"""
+    parq_forms = ParqForm.objects.all().order_by('-created_at')
+    
+    context = {
+        'parq_forms': parq_forms,
+        'title': 'PAR-Q Forms'
+    }
+    return render(request, 'parq/parq_list.html', context)
+
+class ParqFormCreateView(CreateView):
+    model = ParqForm
+    form_class = ParqFormModelForm
+    template_name = 'parq/parq_form.html'
+    success_url = reverse_lazy('parq_list')
+
+class ParqFormUpdateView(UpdateView):
+    model = ParqForm
+    form_class = ParqUpdateForm
+    template_name = 'parq/parq_update_form.html'
+    success_url = reverse_lazy('parq_list')
+
+class ParqFormDetailView(DetailView):
+    model = ParqForm
+    template_name = 'parq/parq_detail.html'
+    context_object_name = 'parq_form'
